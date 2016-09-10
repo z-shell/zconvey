@@ -21,6 +21,9 @@ fi
 
 typeset -gi ZCONVEY_ID
 typeset -hH ZCONVEY_FD
+typeset -g ZCONVEY_CHECK_INTERVAL
+zstyle -s ":plugin:zconvey" check_interval ZCONVEY_CHECK_INTERVAL || ZCONVEY_CHECK_INTERVAL="2"
+[[ -o extendedglob && "$ZCONVEY_CHECK_INTERVAL" != <-> ]] && ZCONVEY_CHECK_INTERVAL="2"
 
 # Binary flock command that supports 0 second timeout
 # (zsystem flock doesn't) - util-linux/flock stripped
