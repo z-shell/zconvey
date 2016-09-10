@@ -59,15 +59,27 @@ fi
 
 }
 
+function __convey_on_period_passed() {
+    sched +"$ZCONVEY_CHECK_INTERVAL" __convey_on_period_passed
+}
+
 function __convey_preexec() {
 }
 
 # Not called ideally at say SIGTERM, but
-# at least - when "exit" is enterred
+# at least when "exit" is enterred
 function __convey_zshexit() {
     exec {ZCONVEY_FD}<&-
 }
 
+if ! type sched 2>/dev/null 1>&2; then
+    if ! zmodload zsh/sched 2>/dev/null; then
+        echo "zsh/sched module not found, Zconvey cannot work with this Zsh build"
+        return 1
+    fi
+fi
+
+sched +"$ZCONVEY_CHECK_INTERVAL" __convey_on_period_passed
 autoload add-zsh-hook
 add-zsh-hook preexec __convey_preexec
 add-zsh-hook zshexit __convey_zshexit
