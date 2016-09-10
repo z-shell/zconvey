@@ -210,6 +210,9 @@ int main(int argc, char *argv[])
 		filename = argv[optind];
 		fd = open_file(filename, &open_flags);
 
+	} else if (optind < argc) {
+		/* Use provided file descriptor */
+		fd = atoi(argv[optind]);
 	} else {
 		/* Bad options */
 		errx(EX_USAGE, _("requires file descriptor, file or directory"));
