@@ -19,8 +19,8 @@ if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$ZCONVEY_REPO_DIR]}" != $ZCONVEY_REPO
     fpath+=( "$ZCONVEY_REPO_DIR" )
 fi
 
-typeset -gi ZCONV_ID
-typeset -hH ZCONV_FD
+typeset -gi ZCONVEY_ID
+typeset -hH ZCONVEY_FD
 
 # Binary flock command that supports 0 second timeout
 # (zsystem flock doesn't) - util-linux/flock stripped
@@ -32,18 +32,39 @@ fi
 
 # Acquire ID
 () {
-    mkdir -p "${ZCONVEY_CONFIG_DIR}/locks"
-    integer idx possible_id=1
+    local LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+    mkdir -p "${LOCKS_DIR}"
+
+    integer idx res
     local fd
     
-    # Supported are 100 shells - acquire takes ~330 ms
+    # Supported are 100 shells - acquire takes ~330ms max
+    ZCONVEY_ID="-1"
     for (( idx=1; idx <= 100; idx ++ )); do
-        :
+        touch "${LOCKS_DIR}/zsh-nr-${idx}"
+        exec {ZCONVEY_FD}<"${LOCKS_DIR}/zsh-nr-${idx}"
+        "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "${ZCONVEY_FD}"
+        res="$?"
+
+        if [ "$res" = "101" ]; then
+            exec {ZCONVEY_FD}<&-
+        else
+            ZCONVEY_ID=idx
+            break
+        fi
     done
+
 }
 
 function __convey_preexec() {
 }
 
+# Not called ideally at say SIGTERM, but
+# at least - when "exit" is enterred
+function __convey_zshexit() {
+    exec {ZCONVEY_FD}<&-
+}
+
 autoload add-zsh-hook
 add-zsh-hook preexec __convey_preexec
+add-zsh-hook zshexit __convey_zshexit
