@@ -75,14 +75,6 @@ static void __attribute__((__noreturn__)) usage(int ex)
 
 static sig_atomic_t timeout_expired = 0;
 
-static void timeout_handler(int sig __attribute__((__unused__)),
-			    siginfo_t *info,
-			    void *context __attribute__((__unused__)))
-{
-	if (info->si_code == SI_TIMER)
-		timeout_expired = 1;
-}
-
 static int open_file(const char *filename, int *flags)
 {
 
@@ -114,7 +106,6 @@ static int open_file(const char *filename, int *flags)
 
 int main(int argc, char *argv[])
 {
-	int have_timeout = 0;
 	int type = LOCK_EX;
 	int block = 0;
 	int open_flags = 0;
@@ -124,7 +115,6 @@ int main(int argc, char *argv[])
 	int no_fork = 0;
 	int status;
 	int verbose = 0;
-	struct timeval time_start, time_done;
 	/*
 	 * The default exit code for lock conflict or timeout
 	 * is specified in man flock.1
