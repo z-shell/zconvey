@@ -241,6 +241,18 @@ function __convey_resolve_name_to_id() {
     done
 }
 
+function __convey_get_name_of_id() {
+    local id="$1"
+
+    REPLY=""
+    local f="$ZCONVEY_NAMES_DIR/${id}.name"
+    if [ -e "$f" ]; then
+        REPLY=${(f)"$(<$f)"}
+        REPLY="${REPLY#:}"
+        REPLY="${REPLY%:}"
+    fi
+}
+
 #
 # User functions
 #
