@@ -465,7 +465,7 @@ function zc-ls() {
         name="$REPLY"
 
         if [[ "$is_locked" = "0" && -n "$name" ]]; then
-            print "(ABSENT)  ID: $idx, NAME: $name"
+            print "\033[1;31m(ABSENT)  ID: $idx, NAME: $name\033[0m"
         elif [[ "$is_locked" = "0" && -z "$name" ]]; then
             # Don't inform about absent, nameless sessions
             :
