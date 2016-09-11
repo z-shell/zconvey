@@ -28,6 +28,8 @@ typeset -hH ZCONVEY_FD
 typeset -g ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
 typeset -g ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
 typeset -g ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR"
+
 () {
     setopt localoptions extendedglob
     typeset -gA ZCONVEY_CONFIG
@@ -85,8 +87,6 @@ if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
 fi
 
 () {
-    command mkdir -p "${ZCONVEY_LOCKS_DIR}" "${ZCONVEY_IO_DIR}"
-
     integer idx res
     local fd lockfile
     
@@ -231,7 +231,6 @@ function pinfo2() {
 
 function __convey_resolve_name() {
     local name="$1"
-    command mkdir -p "$ZCONVEY_NAMES_DIR"
 
     REPLY=""
     local f
