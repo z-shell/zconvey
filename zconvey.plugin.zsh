@@ -127,14 +127,14 @@ function __convey_on_period_passed() {
     # ..and block Ctrl-C, this function will not stall
     setopt localtraps; trap '' INT
 
-    # Let's hope next call will have Zle active..
-    zle || return 1
-
     local fd datafile="${ZCONVEY_CONFIG_DIR}/io/${ZCONVEY_ID}.io"
     local lockfile="${datafile}.lock"
 
     # Quick return when no data
     [ ! -e "$datafile" ] && return 1
+
+    # Let's hope next call will have Zle active..
+    zle || return 1
 
     command touch "$lockfile"
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
@@ -191,6 +191,8 @@ function __convey_on_period_passed() {
     zle .accept-line
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
     # .kill-line, .vi-kill-line, .kill-buffer, .kill-whole-line
+
+    return 0
 }
 
 #
