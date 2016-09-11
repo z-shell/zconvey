@@ -333,7 +333,7 @@ function zc() {
     setopt localoptions extendedglob
 
     local -A opthash
-    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __convey_usage_zc; return 1; }
+    zparseopts -E -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: || { __convey_usage_zc; return 1; }
 
     integer have_id=0 have_name=0 verbose=0 quiet=0
     local id name
@@ -364,4 +364,53 @@ function zc() {
         pinfo "ID must be numeric, 1..100"
         return 1
     fi
+
+    if (( $have_name )); then
+        __convey_resolve_name "$name"
+        local resolved="$REPLY"
+        if [ -z "$resolved" ]; then
+            echo "Could not find session named: \`$name'"
+            return 1
+        fi
+
+        # Store the resolved ID and continue normally,
+        # with ID as the main specifier of session
+        id="$resolved"
+    fi
+
+    local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
+    local lockfile="${datafile}.lock"
+    command touch "$lockfile"
+
+    # 1. Zsh lock with timeout (2 seconds)
+    if (( ${ZCONVEY_CONFIG[use_zsystem_flock]} > 0 )); then
+        (( ${verbose} )) && print "Will use zsystem flock..."
+        if ! zsystem flock -t 2 -f fd -r "$lockfile"; then
+            pinfo2 "Communication channel of session $id is busy, could not send"
+            return 1
+        fi
+    # 2. Provided flock binary (two calls)
+    else
+        (( ${verbose} )) && print "Will use provided flock..."
+        exec {fd}<"$lockfile"
+        "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+        if [ "$?" = "101" ]; then
+            (( ${verbose} )) && print "First attempt failed, will retry..."
+            LANG=C sleep 1
+            "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+            if [ "$?" = "101" ]; then
+                pinfo2 "Communication channel of session $id is busy, could not send"
+                return 1
+            fi
+        fi
+    fi
+
+    print -r -- "$*" > "$datafile"
+
+    if (( ${quiet} == 0 )); then
+        pinfo2 "Zconvey successfully sent command to session $id"
+    fi
+
+    # Release the lock by closing the lock file
+    exec {fd}<&-
 }
