@@ -120,7 +120,6 @@ function __convey_on_period_passed() {
     # Quick return when no data
     [ ! -e "$datafile" ] && { sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed; return 1 }
 
-    echo "== At 1 =="
     command touch "$lockfile"
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
     if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
@@ -140,9 +139,7 @@ function __convey_on_period_passed() {
         fi
     # 2. Zsh < 5.3 flock that isn't non-blocking
     elif [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "2" ]; then
-        echo "== At 2 =="
         if ! zsystem flock -t 2 -f fd -r "$lockfile"; then
-            echo "== At 3 =="
             # Waited too long, lock must be broken, remove it
             command rm -f "$lockfile"
             # Will handle this input at next call
@@ -171,15 +168,10 @@ function __convey_on_period_passed() {
         fi
     fi
 
-    echo "== At 4 =="
-    # Read input using history mechanism
     local -a commands
-    () { fc -ap -R "$datafile"; commands=( ${history[@]} ) }
-    # commands=( "${(@f)"$(<$datafile)"}" )
+    commands=( "${(@f)"$(<$datafile)"}" )
     rm -f "$datafile"
 
-    echo "== At 5 =="
-    commands=( "${(aO)commands[@]}" )
     print -rl -- "${commands[@]}"
 
     exec {fd}<&-
