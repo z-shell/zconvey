@@ -83,7 +83,7 @@ fi
 
 () {
     local LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-    mkdir -p "${LOCKS_DIR}" "${ZCONVEY_CONFIG_DIR}/io"
+    command mkdir -p "${LOCKS_DIR}" "${ZCONVEY_CONFIG_DIR}/io"
 
     integer idx res
     local fd lockfile
