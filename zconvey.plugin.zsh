@@ -180,6 +180,11 @@ function __convey_on_period_passed() {
     rm -f "$datafile"
     exec {fd}<&-
 
+    # None of the following work, why?
+    zle .redisplay
+    zle .kill-buffer
+    LBUFFER+="${(j:; :)commands[@]}"
+    print -zr "${(j:; :)commands[@]}"
     print -rl -- "${commands[@]}"
 }
 
