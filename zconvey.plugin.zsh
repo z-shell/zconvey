@@ -35,8 +35,8 @@ typeset -hH ZCONVEY_FD
     ZCONVEY_CONFIG[check_interval]="$check_interval"
 
     local use_zsystem_flock
-    zstyle -s ":plugin:zconvey" use_zsystem_flock use_zsystem_flock || use_zsystem_flock="1"
-    [[ "$use_zsystem_flock" != <-> ]] && use_zsystem_flock="1"
+    zstyle -b ":plugin:zconvey" use_zsystem_flock use_zsystem_flock || use_zsystem_flock="yes"
+    [ "$use_zsystem_flock" = "yes" ] && use_zsystem_flock="1" || use_zsystem_flock="0"
     ZCONVEY_CONFIG[use_zsystem_flock]="$use_zsystem_flock"
 }
 
