@@ -25,6 +25,7 @@ fi
 
 typeset -gi ZCONVEY_ID
 typeset -hH ZCONVEY_FD
+typeset -g NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
 () {
     setopt localoptions extendedglob
     typeset -gA ZCONVEY_CONFIG
@@ -228,7 +229,7 @@ function pinfo2() {
 }
 
 function __convey_resolve_name() {
-    local name="$1" NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+    local name="$1"
     command mkdir -p "$NAMES_DIR"
 
     REPLY=""
@@ -244,6 +245,78 @@ function __convey_resolve_name() {
 # User functions
 #
 
+function __convey_usage_zc-rename() {
+    pinfo2 "Renames given Zsh session, which is given via ID or (old) NAME"
+    pinfo "Usage: zc-rename {-i ID}|{-n NAME} [-q|--quiet] [-h|--help] NEW_NAME"
+    print -- "-h/--help                - this message"
+    print -- "-i ID / --id ID          - ID (number) of Zsh session"
+    print -- "-n NAME / --name NAME    - NAME of Zsh session"
+    print -- "-q/--quiet               - don't output status messages"
+}
+
+function zc-rename() {
+    setopt localoptions extendedglob
+
+    local -A opthash
+    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __convey_usage_zc-rename; return 1; }
+
+    integer have_id=0 have_name=0 quiet=0
+    local id name new_name="$1"
+
+    # Help
+    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc-rename; return 0; }
+    [ -z "$new_name" ] && { echo "No new name given"; __convey_usage_zc-rename; return 1; }
+
+    # ID
+    have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
+    (( ${+opthash[-i]} )) && id="${opthash[-i]}"
+    (( ${+opthash[--id]} )) && id="${opthash[--id]}"
+
+    # NAME
+    have_name=$(( ${+opthash[-n]} + ${+opthash[--name]} ))
+    (( ${+opthash[-n]} )) && name="${opthash[-n]}"
+    (( ${+opthash[--name]} )) && name="${opthash[--name]}"
+
+    # VERBOSE, QUIET
+    (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
+    (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
+
+    if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
+        pinfo "Please supply only one of ID (-i) and NAME (-n)"
+        return 1
+    fi
+
+    if [[ "$have_id" != "0" && "$id" != <-> ]]; then
+        pinfo "ID must be numeric, 1..100"
+        return 1
+    fi
+
+    # Rename via NAME?
+    if (( $have_name )); then
+        __convey_resolve_name "$name"
+        local resolved="$REPLY"
+        if [ -z "$resolved" ]; then
+            echo "Could not find session named: \`$name'"
+            return 1
+        fi
+
+        __convey_resolve_name "$new_name"
+        if [ -n "$REPLY" ]; then
+            echo "A session already has target name: \`$new_name' (its ID: $REPLY)"
+            return 1
+        fi
+
+        # Store the resolved ID and continue normally,
+        # with ID as the main specifier of session
+        id="$resolved"
+    fi
+
+    print ":$new_name:" > "$NAMES_DIR"/"$id".name
+
+    if (( ${quiet} == 0 )); then
+        pinfo2 "Renamed session $id to: $new_name"
+    fi
+}
 
 function __convey_usage_zc() {
     pinfo "Sends specified commands to given (via ID or NAME) Zsh session"
