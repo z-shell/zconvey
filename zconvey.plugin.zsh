@@ -172,10 +172,9 @@ function __convey_on_period_passed() {
     local -a commands
     commands=( "${(@f)"$(<$datafile)"}" )
     rm -f "$datafile"
+    exec {fd}<&-
 
     print -rl -- "${commands[@]}"
-
-    exec {fd}<&-
 }
 
 #
