@@ -479,3 +479,13 @@ function zc-ls() {
         fi
     done
 }
+
+function zc-id() {
+    __convey_get_name_of_id "$ZCONVEY_ID"
+    if [ -z "$REPLY" ]; then
+        print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m (no name assigned)";
+    else
+        print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m, name: \033[1;33m${REPLY}\033[0m";
+    fi
+}
+
