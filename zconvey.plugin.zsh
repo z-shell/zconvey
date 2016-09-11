@@ -333,7 +333,7 @@ function zc() {
     setopt localoptions extendedglob
 
     local -A opthash
-    zparseopts -E -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: || { __convey_usage_zc; return 1; }
+    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: || { __convey_usage_zc; return 1; }
 
     integer have_id=0 have_name=0 verbose=0 quiet=0
     local id name
