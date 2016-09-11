@@ -25,7 +25,9 @@ fi
 
 typeset -gi ZCONVEY_ID
 typeset -hH ZCONVEY_FD
-typeset -g NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -g ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
+typeset -g ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+typeset -g ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
 () {
     setopt localoptions extendedglob
     typeset -gA ZCONVEY_CONFIG
@@ -83,8 +85,8 @@ if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
 fi
 
 () {
-    local LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-    command mkdir -p "${LOCKS_DIR}" "${ZCONVEY_CONFIG_DIR}/io"
+    local ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+    command mkdir -p "${ZCONVEY_LOCKS_DIR}" "${ZCONVEY_CONFIG_DIR}/io"
 
     integer idx res
     local fd lockfile
@@ -92,7 +94,7 @@ fi
     # Supported are 100 shells - acquire takes ~400ms max (zsystem's flock)
     ZCONVEY_ID="-1"
     for (( idx=1; idx <= 100; idx ++ )); do
-        lockfile="${LOCKS_DIR}/zsh_nr${idx}"
+        lockfile="${ZCONVEY_LOCKS_DIR}/zsh_nr${idx}"
         command touch "$lockfile"
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
@@ -230,11 +232,11 @@ function pinfo2() {
 
 function __convey_resolve_name() {
     local name="$1"
-    command mkdir -p "$NAMES_DIR"
+    command mkdir -p "$ZCONVEY_NAMES_DIR"
 
     REPLY=""
     local f
-    for f in "$NAMES_DIR"/*.name(N); do
+    for f in "$ZCONVEY_NAMES_DIR"/*.name(N); do
         if [[ ${(M)${(f)"$(<$f)"}:#:$name:} ]]; then
             REPLY="${${f:t}%.name}"
         fi
@@ -311,7 +313,7 @@ function zc-rename() {
         id="$resolved"
     fi
 
-    print ":$new_name:" > "$NAMES_DIR"/"$id".name
+    print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
 
     if (( ${quiet} == 0 )); then
         pinfo2 "Renamed session $id to: $new_name"
