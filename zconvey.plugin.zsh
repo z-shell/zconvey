@@ -86,7 +86,7 @@ fi
     ZCONVEY_ID="-1"
     for (( idx=1; idx <= 100; idx ++ )); do
         lockfile="${LOCKS_DIR}/zsh_nr${idx}"
-        touch "$lockfile"
+        command touch "$lockfile"
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
         if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
