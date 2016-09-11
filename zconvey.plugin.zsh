@@ -98,7 +98,7 @@ fi
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
         if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-            zsystem flock -f ZCONVEY_FD -r "$i" "$lockfile"
+            zsystem flock -f ZCONVEY_FD -r "$lockfile"
             res="$?"
         else
             exec {ZCONVEY_FD}<"$lockfile"
