@@ -57,23 +57,49 @@ fi
 # Acquire ID
 #
 
+if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+    autoload is-at-least
+    if ! is-at-least 5.3; then
+        # Use, but not for acquire
+        ZCONVEY_CONFIG[use_zsystem_flock]="2"
+    fi
+
+    if ! zmodload zsh/system 2>/dev/null; then
+        echo "Zconvey plugin: \033[1;31mzsh/system module not found, will use own flock implementation\033[0m"
+        echo "Zconvey plugin: \033[1;31mDisable this warning via: zstyle \":plugin:zconvey\" use_zsystem_flock \"0\"\033[0m"
+        ZCONVEY_CONFIG[use_zsystem_flock]="0"
+    elif ! zsystem supports flock; then
+        echo "Zconvey plugin: \033[1;31mzsh/system module doesn't provide flock, will use own implementation\033[0m"
+        echo "Zconvey plugin: \033[1;31mDisable this warning via: zstyle \":plugin:zconvey\" use_zsystem_flock \"0\"\033[0m"
+        ZCONVEY_CONFIG[use_zsystem_flock]="0"
+    fi
+fi
+
 () {
     local LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
     mkdir -p "${LOCKS_DIR}" "${ZCONVEY_CONFIG_DIR}/io"
 
     integer idx res
-    local fd
+    local fd lockfile
     
-    # Supported are 100 shells - acquire takes ~330ms max
+    # Supported are 100 shells - acquire takes ~400ms max (zsystem's flock)
     ZCONVEY_ID="-1"
     for (( idx=1; idx <= 100; idx ++ )); do
-        touch "${LOCKS_DIR}/zsh_nr${idx}"
-        exec {ZCONVEY_FD}<"${LOCKS_DIR}/zsh_nr${idx}"
-        "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "${ZCONVEY_FD}"
-        res="$?"
+        lockfile="${LOCKS_DIR}/zsh_nr${idx}"
+        touch "$lockfile"
 
-        if [ "$res" = "101" ]; then
-            exec {ZCONVEY_FD}<&-
+        # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
+        if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+            zsystem flock -f ZCONVEY_ID -r "$i" "$lockfile"
+            res="$?"
+        else
+            exec {ZCONVEY_FD}<"$lockfile"
+            "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "${ZCONVEY_FD}"
+            res="$?"
+        fi
+
+        if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
+            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" != "1" ] && exec {ZCONVEY_FD}<&-
         else
             ZCONVEY_ID=idx
             break
@@ -99,7 +125,7 @@ function __convey_on_period_passed() {
 }
 
 #
-# Startup, other
+# Schedule, other
 #
 
 # Not called ideally at say SIGTERM, but
@@ -112,18 +138,6 @@ if ! type sched 2>/dev/null 1>&2; then
     if ! zmodload zsh/sched 2>/dev/null; then
         echo "Zconvey plugin: \033[1;31mzsh/sched module not found, Zconvey cannot work with this Zsh build, aborting\033[0m"
         return 1
-    fi
-fi
-
-if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-    if ! zmodload zsh/system 2>/dev/null; then
-        echo "Zconvey plugin: \033[1;31mzsh/system module not found, will use own flock implementation\033[0m"
-        echo "Zconvey plugin: \033[1;31mDisable this warning via: zstyle \":plugin:zconvey\" use_zsystem_flock \"0\"\033[0m"
-        ZCONVEY_CONFIG[use_zsystem_flock]="0"
-    elif ! zsystem supports flock; then
-        echo "Zconvey plugin: \033[1;31mzsh/system module doesn't provide flock, will use own implementation\033[0m"
-        echo "Zconvey plugin: \033[1;31mDisable this warning via: zstyle \":plugin:zconvey\" use_zsystem_flock \"0\"\033[0m"
-        ZCONVEY_CONFIG[use_zsystem_flock]="0"
     fi
 fi
 
