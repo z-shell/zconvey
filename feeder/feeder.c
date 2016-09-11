@@ -46,4 +46,6 @@ int main( int argc, char *argv[] ) {
     output( buf );
 
     free( buf );
+
+    return 0;
 }
