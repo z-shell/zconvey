@@ -85,8 +85,7 @@ if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
 fi
 
 () {
-    local ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-    command mkdir -p "${ZCONVEY_LOCKS_DIR}" "${ZCONVEY_CONFIG_DIR}/io"
+    command mkdir -p "${ZCONVEY_LOCKS_DIR}" "${ZCONVEY_IO_DIR}"
 
     integer idx res
     local fd lockfile
@@ -130,7 +129,7 @@ function __convey_on_period_passed() {
     # ..and block Ctrl-C, this function will not stall
     setopt localtraps; trap '' INT
 
-    local fd datafile="${ZCONVEY_CONFIG_DIR}/io/${ZCONVEY_ID}.io"
+    local fd datafile="${ZCONVEY_IO_DIR}/${ZCONVEY_ID}.io"
     local lockfile="${datafile}.lock"
 
     # Quick return when no data
