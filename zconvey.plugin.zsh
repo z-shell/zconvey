@@ -25,9 +25,9 @@ fi
 
 typeset -gi ZCONVEY_ID
 typeset -ghH ZCONVEY_FD
-typeset -g ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
-typeset -g ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-typeset -g ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -ghH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
+typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
 command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR"
 
 () {
