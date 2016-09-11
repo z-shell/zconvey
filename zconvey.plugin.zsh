@@ -115,6 +115,17 @@ if ! type sched 2>/dev/null 1>&2; then
     fi
 fi
 
+if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+    if ! zmodload zsh/system 2>/dev/null; then
+        echo "Zconvey plugin: \033[1;31mzsh/system module not found, will use own flock implementation\033[0m"
+        echo "Zconvey plugin: \033[1;31mDisable this warning via: zstyle \":plugin:zconvey\" use_zsystem_flock \"0\"\033[0m"
+        ZCONVEY_CONFIG[use_zsystem_flock]="0"
+    elif ! zsystem supports flock; then
+        echo "Zconvey plugin: \033[1;31mzsh/system module doesn't provide flock, will use own implementation\033[0m"
+        echo "Zconvey plugin: \033[1;31mDisable this warning via: zstyle \":plugin:zconvey\" use_zsystem_flock \"0\"\033[0m"
+        ZCONVEY_CONFIG[use_zsystem_flock]="0"
+    fi
+fi
 
 sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 autoload -Uz add-zsh-hook
