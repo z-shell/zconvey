@@ -118,6 +118,9 @@ function __convey_on_period_passed() {
     # press Ctrl-C when function will be working
     sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 
+    # ..and block Ctrl-C, this function will not stall
+    setopt localtraps; trap '' INT
+
     # Let's hope next call will have Zle active..
     zle || return 1
 
