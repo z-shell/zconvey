@@ -470,9 +470,17 @@ function zc-ls() {
             # Don't inform about absent, nameless sessions
             :
         elif [[ "$is_locked" = "1" && -z "$name" ]]; then
-            print "(PRESENT) ID: $idx"
+            if [ "$idx" = "$ZCONVEY_ID" ]; then
+                print "\033[1;33m(CURRENT) ID: $idx\033[0m"
+            else
+                print "(PRESENT) ID: $idx"
+            fi
         elif [[ "$is_locked" = "1" && -n "$name" ]]; then
-            print "(PRESENT) ID: $idx, NAME: $name"
+            if [ "$idx" = "$ZCONVEY_ID" ]; then
+                print "\033[1;33m(CURRENT) ID: $idx, NAME: $name\033[0m"
+            else
+                print "(PRESENT) ID: $idx, NAME: $name"
+            fi
         fi
     done
 }
