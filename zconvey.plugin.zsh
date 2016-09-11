@@ -114,11 +114,15 @@ fi
 #
 
 function __convey_on_period_passed() {
+    # Reschedule as quickly as possible - user might
+    # press Ctrl-C when function will be working
+    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+
     local fd datafile="${ZCONVEY_CONFIG_DIR}/io/${ZCONVEY_ID}.io"
     local lockfile="${datafile}.lock"
 
     # Quick return when no data
-    [ ! -e "$datafile" ] && { sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed; return 1 }
+    [ ! -e "$datafile" ] && return 1
 
     command touch "$lockfile"
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
@@ -132,7 +136,6 @@ function __convey_on_period_passed() {
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
-                    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
                     return 1
                 fi
             fi
@@ -143,7 +146,6 @@ function __convey_on_period_passed() {
             # Waited too long, lock must be broken, remove it
             command rm -f "$lockfile"
             # Will handle this input at next call
-            sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
             return 1
         fi
     # 3. Provided flock binary
@@ -161,7 +163,6 @@ function __convey_on_period_passed() {
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
-                    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
                     return 1
                 fi
             fi
@@ -175,8 +176,6 @@ function __convey_on_period_passed() {
     print -rl -- "${commands[@]}"
 
     exec {fd}<&-
-
-    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 }
 
 #
