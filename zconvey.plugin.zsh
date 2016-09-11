@@ -94,7 +94,7 @@ fi
             res="$?"
         else
             exec {ZCONVEY_FD}<"$lockfile"
-            "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "${ZCONVEY_FD}"
+            "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$ZCONVEY_FD"
             res="$?"
         fi
 
@@ -113,13 +113,61 @@ fi
 #
 
 function __convey_on_period_passed() {
-    local fd lockfile="${ZCONVEY_CONFIG_DIR}/io/${ZCONVEY_ID}.io.lock"
+    local fd datafile="${ZCONVEY_CONFIG_DIR}/io/${ZCONVEY_ID}.io"
+    local lockfile="${datafile}.lock"
 
-    touch "$lockfile"
-    if zsystem flock -t 1 -f fd -r "$lockfile"; then
-        echo "Got at command"
-        zsystem flock -u "$fd"
+    # Quick return when no data
+    [ ! -e "$datafile" ] && { sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed; return 1 }
+
+    command touch "$lockfile"
+    # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
+    if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+        if ! zsystem flock -t 0 -f fd -r "$lockfile"; then
+            LANG=C sleep 0.11
+            if ! zsystem flock -t 0 -f fd -r "$lockfile"; then
+                # Examine the situation by waiting long
+                LANG=C sleep 0.5
+                if ! zsystem flock -t 1 -f fd -r "$lockfile"; then
+                    # Waited too long, lock must be broken, remove it
+                    command rm -f "$lockfile"
+                    # Will handle this input at next call
+                    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+                    return 1
+                fi
+            fi
+        fi
+    # 2. Zsh < 5.3 flock that isn't non-blocking
+    elif [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "2" ]; then
+        if ! zsystem flock -t 2 -f fd -r "$lockfile"; then
+            # Waited too long, lock must be broken, remove it
+            command rm -f "$lockfile"
+            # Will handle this input at next call
+            sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+            return 1
+        fi
+    # 3. Provided flock binary
+    else
+        exec {fd}<"$lockfile"
+        "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+        if [ "$?" = "101" ]; then
+            LANG=C sleep 0.11
+            "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+            if [ "$?" = "101" ]; then
+                # Examine the situation by waiting long
+                sleep 1
+                "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+                if [ "$?" = "101" ]; then
+                    # Waited too long, lock must be broken, remove it
+                    command rm -f "$lockfile"
+                    # Will handle this input at next call
+                    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+                    return 1
+                fi
+            fi
+        fi
     fi
+
+    exec {fd}<&-
 
     sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 }
