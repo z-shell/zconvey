@@ -135,9 +135,6 @@ function __convey_on_period_passed() {
     # Quick return when no data
     [ ! -e "$datafile" ] && return 1
 
-    # Let's hope next call will have Zle active..
-    zle || return 1
-
     command touch "$lockfile"
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
     if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
