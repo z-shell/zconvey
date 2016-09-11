@@ -319,7 +319,7 @@ function zc-rename() {
 }
 
 function __convey_usage_zc() {
-    pinfo "Sends specified commands to given (via ID or NAME) Zsh session"
+    pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
     pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help]"
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
