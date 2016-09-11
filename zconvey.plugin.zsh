@@ -118,6 +118,9 @@ function __convey_on_period_passed() {
     # press Ctrl-C when function will be working
     sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 
+    # Let's hope next call will have Zle active..
+    zle || return 1
+
     local fd datafile="${ZCONVEY_CONFIG_DIR}/io/${ZCONVEY_ID}.io"
     local lockfile="${datafile}.lock"
 
