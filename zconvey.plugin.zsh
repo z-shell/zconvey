@@ -343,9 +343,9 @@ function zc() {
     setopt localoptions extendedglob
 
     local -A opthash
-    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: || { __convey_usage_zc; return 1; }
+    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: zs -zshselect || { __convey_usage_zc; return 1; }
 
-    integer have_id=0 have_name=0 verbose=0 quiet=0
+    integer have_id=0 have_name=0 verbose=0 quiet=0 zshselect=0
     local id name
 
     # Help
@@ -361,6 +361,9 @@ function zc() {
     (( ${+opthash[-n]} )) && name="${opthash[-n]}"
     (( ${+opthash[--name]} )) && name="${opthash[--name]}"
 
+    # ZSH-SELECT (for acquiring ID)
+    (( zshselect = ${+opthash[-zs]} + ${+opthash[--zshselect]} ))
+
     # VERBOSE, QUIET
     (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
     (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
@@ -375,6 +378,11 @@ function zc() {
         return 1
     fi
 
+    if [[ "$have_id" = 0 && "$have_name" = "0" && "$zshselect" = "0" ]]; then
+        pinfo "Either supply target ID/NAME or request Zsh-Select (-zs/--zshselect)"
+        return 1
+    fi
+
     if (( $have_name )); then
         __convey_resolve_name_to_id "$name"
         local resolved="$REPLY"
@@ -386,6 +394,18 @@ function zc() {
         # Store the resolved ID and continue normally,
         # with ID as the main specifier of session
         id="$resolved"
+    elif (( $zshselect )); then
+        if ! type zsh-select 2>/dev/null 1>&2; then
+            pinfo "Zsh-Select not installed, please install it first, aborting"
+        else
+            id=`zc-ls | zsh-select`
+            if [ -z "$id" ]; then
+                pinfo "No selection, exiting"
+                return 0
+            else
+                id="${id//(#b)*ID: ([[:digit:]]#),*/$match[1]}"
+            fi
+        fi
     fi
 
     local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
