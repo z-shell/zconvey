@@ -186,7 +186,7 @@ function __convey_on_period_passed() {
     rm -f "$datafile"
     exec {fd}<&-
 
-    "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]}"
+    "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]} ##"
 
     zle .accept-line
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
