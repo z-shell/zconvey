@@ -223,6 +223,23 @@ function pinfo() {
     print -- "\033[1;32m$*\033[0m";
 }
 
+function pinfo2() {
+    print -- "\033[1;33m$*\033[0m";
+}
+
+function __convey_resolve_name() {
+    local name="$1" NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+    command mkdir -p "$NAMES_DIR"
+
+    REPLY=""
+    local f
+    for f in "$NAMES_DIR"/*.name(N); do
+        if [[ ${(M)${(f)"$(<$f)"}:#:$name:} ]]; then
+            REPLY="${${f:t}%.name}"
+        fi
+    done
+}
+
 #
 # User functions
 #
