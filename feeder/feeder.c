@@ -21,7 +21,6 @@ void output( char *cmd ) {
             c = cmd + i;
             ioctl( 0, TIOCSTI, c );
         }
-        printf("\n");
     }
 }
 
