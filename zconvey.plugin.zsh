@@ -188,7 +188,6 @@ function __convey_on_period_passed() {
 
     "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]} ##"
 
-    zle .accept-line
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
     # .kill-line, .vi-kill-line, .kill-buffer, .kill-whole-line
 
