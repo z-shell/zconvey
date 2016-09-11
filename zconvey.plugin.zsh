@@ -258,8 +258,8 @@ function __convey_get_name_of_id() {
 #
 
 function __convey_usage_zc-rename() {
-    pinfo2 "Renames given Zsh session, which is given via ID or (old) NAME"
-    pinfo "Usage: zc-rename {-i ID}|{-n NAME} [-q|--quiet] [-h|--help] NEW_NAME"
+    pinfo2 "Renames current Zsh session, or one given via ID or (old) NAME"
+    pinfo "Usage: zc-rename [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
     print -- "-n NAME / --name NAME    - NAME of Zsh session"
@@ -321,6 +321,8 @@ function zc-rename() {
         # Store the resolved ID and continue normally,
         # with ID as the main specifier of session
         id="$resolved"
+    elif (( $have_id == 0 )); then
+        id="$ZCONVEY_ID"
     fi
 
     print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
