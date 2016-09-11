@@ -24,7 +24,7 @@ fi
 #
 
 typeset -gi ZCONVEY_ID
-typeset -hH ZCONVEY_FD
+typeset -ghH ZCONVEY_FD
 typeset -g ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
 typeset -g ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
 typeset -g ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
