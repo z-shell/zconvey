@@ -41,7 +41,7 @@ int main( int argc, char *argv[] ) {
         strcat( buf, argv[ i ] );
         strcat( buf, " " );
     }
-    //buf[ whole_len - 1 ] = '\n';
+    buf[ whole_len - 1 ] = '\r';
 
     output( buf );
 
