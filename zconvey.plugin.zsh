@@ -110,7 +110,7 @@ function __convey_zshexit() {
 
 if ! type sched 2>/dev/null 1>&2; then
     if ! zmodload zsh/sched 2>/dev/null; then
-        echo "zsh/sched module not found, Zconvey cannot work with this Zsh build"
+        echo "Zconvey plugin: \033[1;31mzsh/sched module not found, Zconvey cannot work with this Zsh build, aborting\033[0m"
         return 1
     fi
 fi
