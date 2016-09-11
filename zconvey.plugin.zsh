@@ -229,7 +229,7 @@ function pinfo2() {
     print -- "\033[1;33m$*\033[0m";
 }
 
-function __convey_resolve_name() {
+function __convey_resolve_name_to_id() {
     local name="$1"
 
     REPLY=""
@@ -293,14 +293,14 @@ function zc-rename() {
 
     # Rename via NAME?
     if (( $have_name )); then
-        __convey_resolve_name "$name"
+        __convey_resolve_name_to_id "$name"
         local resolved="$REPLY"
         if [ -z "$resolved" ]; then
             echo "Could not find session named: \`$name'"
             return 1
         fi
 
-        __convey_resolve_name "$new_name"
+        __convey_resolve_name_to_id "$new_name"
         if [ -n "$REPLY" ]; then
             echo "A session already has target name: \`$new_name' (its ID: $REPLY)"
             return 1
@@ -365,7 +365,7 @@ function zc() {
     fi
 
     if (( $have_name )); then
-        __convey_resolve_name "$name"
+        __convey_resolve_name_to_id "$name"
         local resolved="$REPLY"
         if [ -z "$resolved" ]; then
             echo "Could not find session named: \`$name'"
