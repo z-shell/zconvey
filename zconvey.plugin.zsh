@@ -214,3 +214,63 @@ fi
 sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 autoload -Uz add-zsh-hook
 add-zsh-hook zshexit __convey_zshexit
+
+#
+# Helper functions
+#
+
+function pinfo() {
+    print -- "\033[1;32m$*\033[0m";
+}
+
+#
+# User functions
+#
+
+
+function __convey_usage_zc() {
+    pinfo "Sends specified commands to given (via ID or NAME) Zsh session"
+    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help]"
+    print -- "-h/--help                - this message"
+    print -- "-i ID / --id ID          - ID (number) of Zsh session"
+    print -- "-n NAME / --name NAME    - NAME of Zsh session"
+    print -- "-q/--quiet               - don't output status messages"
+    print -- "-v/--verbose             - output more status messages"
+}
+
+function zc() {
+    setopt localoptions extendedglob
+
+    local -A opthash
+    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __convey_usage_zc; return 1; }
+
+    integer have_id=0 have_name=0 verbose=0 quiet=0
+    local id name
+
+    # Help
+    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc; return 0; }
+
+    # ID
+    have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
+    (( ${+opthash[-i]} )) && id="${opthash[-i]}"
+    (( ${+opthash[--id]} )) && id="${opthash[--id]}"
+
+    # NAME
+    have_name=$(( ${+opthash[-n]} + ${+opthash[--name]} ))
+    (( ${+opthash[-n]} )) && name="${opthash[-n]}"
+    (( ${+opthash[--name]} )) && name="${opthash[--name]}"
+
+    # VERBOSE, QUIET
+    (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
+    (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
+
+    if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
+        pinfo "Please supply only one of ID (-i) and NAME (-n)"
+        return 1
+    fi
+
+    if [[ "$have_id" != "0" && "$id" != <-> ]]; then
+        pinfo "ID must be numeric, 1..100"
+        return 1
+    fi
+}
