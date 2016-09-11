@@ -186,12 +186,11 @@ function __convey_on_period_passed() {
     rm -f "$datafile"
     exec {fd}<&-
 
-    # None of the following work, why?
-    zle .redisplay
-    zle .kill-buffer
-    LBUFFER+="${(j:; :)commands[@]}"
-    print -zr "${(j:; :)commands[@]}"
-    print -rl -- "${commands[@]}"
+    "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]}"
+
+    zle .accept-line
+    # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
+    # .kill-line, .vi-kill-line, .kill-buffer, .kill-whole-line
 }
 
 #
