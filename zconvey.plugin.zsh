@@ -296,15 +296,15 @@ function zc-ls() {
             :
         elif [[ "$is_locked" = "1" && -z "$name" ]]; then
             if [ "$idx" = "$ZCONVEY_ID" ]; then
-                print "\033[1;33m(CURRENT) ID: $idx\033[0m"
+                print "\033[1;32m(CURRENT) ID: $idx\033[0m"
             else
-                print "(PRESENT) ID: $idx"
+                print "(ON-LINE) ID: $idx"
             fi
         elif [[ "$is_locked" = "1" && -n "$name" ]]; then
             if [ "$idx" = "$ZCONVEY_ID" ]; then
-                print "\033[1;33m(CURRENT) ID: $idx, NAME: $name\033[0m"
+                print "\033[1;32m(CURRENT) ID: $idx, NAME: $name\033[0m"
             else
-                print "(PRESENT) ID: $idx, NAME: $name"
+                print "(ON-LINE) ID: $idx, NAME: $name"
             fi
         fi
     done
