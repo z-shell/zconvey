@@ -282,7 +282,7 @@ function zc-ls() {
         if [ -n "$idfile" ]; then
             # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
             if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-                zsystem flock -f tmpfd -r "$i" "$idfile"
+                zsystem flock -f tmpfd -r "$idfile"
                 res="$?"
                 echo "zsystem"
             else
