@@ -387,13 +387,18 @@ if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
 fi
 
 () {
-    integer idx res
+    setopt localoptions extendedglob
+
+    integer idx try_id res
     local fd lockfile
     
     # Supported are 100 shells - acquire takes ~400ms max (zsystem's flock)
-    ZCONVEY_ID="-1"
-    for (( idx=1; idx <= 100; idx ++ )); do
-        lockfile="${ZCONVEY_LOCKS_DIR}/zsh_nr${idx}"
+    for (( idx=0; idx <= 100; idx ++ )); do
+        # First (at first loop) try with $ZCONVEY_ID (the case of inherited ID)
+        [[ "$idx" = "0" && "$ZCONVEY_ID" = <-> ]] && try_id="$ZCONVEY_ID" || try_id="$idx"
+        [[ "$try_id" = "0" ]] && continue
+
+        lockfile="${ZCONVEY_LOCKS_DIR}/zsh_nr${try_id}"
         command touch "$lockfile"
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
@@ -408,9 +413,29 @@ fi
 
         if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
             [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" != "1" ] && exec {ZCONVEY_FD}<&-
+
+            # Is this the special case, i.e. inherition of ZCONVEY_ID?
+            # In this case being unable to lock means: we already have
+            # that lock, we're at our ZCONVEY_ID, we should use it
+            # (process cannot lock files locked by itself, too)
+            if [[ "$idx" = "0" ]]; then
+                # Export again just to be sure
+                export ZCONVEY_ID
+                break
+            fi
         else
-            ZCONVEY_ID=idx
-            break
+            # Successful locking in the special case (try_id = ZCONVEY_ID,
+            # i.e. idx == 0) means: we don't want to have that lock because
+            # it's not inherited (i.e. not already locked by ourselves)
+            if [[ "$idx" = "0" ]]; then
+                # Release the out of order lock
+                exec {ZCONVEY_FD}<&-
+            else
+                ZCONVEY_ID=try_id
+                # ID will be inherited by subshells and exec zsh calls
+                export ZCONVEY_ID
+                break
+            fi
         fi
     done
 
