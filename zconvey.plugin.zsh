@@ -339,6 +339,32 @@ function zc-id() {
     fi
 }
 
+# Prints a graphical "logo" with ID and NAME
+function zc-id-logo() {
+    integer halfl=$(( LINES / 2 )) halfc=$(( COLUMNS / 2 ))
+    integer hlen tlen
+    local text headerline=""
+
+    __convey_get_name_of_id "$ZCONVEY_ID"
+    if [ -z "$REPLY" ]; then
+        text="ID: <$ZCONVEY_ID> NAME: (no name assigned)"
+    else
+        text="ID: <$ZCONVEY_ID> NAME: $REPLY"
+    fi
+    tlen="${#text}"
+    hlen=tlen+4
+    headerline="${(l:hlen:: :)headerline}"
+
+    echotc sc
+    echotc cm $(( halfl - 3 )) $(( halfc - hlen/2 ))
+    print -n "\033[1;42m$headerline\033[0m"
+    echotc cm $(( halfl - 2 )) $(( halfc - hlen/2 ))
+    print -n "\033[1;42m \033[0m \033[1;33m$text\033[0m \033[1;42m \033[0m"
+    echotc cm $(( halfl - 1 )) $(( halfc - hlen/2 ))
+    print -n "\033[1;42m$headerline\033[0m"
+    echotc rc
+}
+
 #
 # Load configuration
 #
@@ -594,3 +620,6 @@ autoload -Uz add-zsh-hook
 add-zsh-hook zshexit __convey_zshexit
 add-zsh-hook preexec __convey_preexec_hook
 add-zsh-hook precmd __convey_precmd_hook
+
+zle -N zc-id-logo
+bindkey '^O^I' zc-id-logo
