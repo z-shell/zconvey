@@ -266,12 +266,13 @@ function zc() {
 
 function zc-ls() {
     integer idx is_locked
-    local idfile tmpfd name
+    local idfile tmpfd name busyfile busywith
 
     for (( idx = 1; idx <= 100; idx ++ )); do
         idfile=""
         tmpfd=""
         name=""
+        busywith=""
         is_locked=0
 
         if [ -e "$ZCONVEY_LOCKS_DIR/zsh_nr${idx}" ]; then
@@ -303,6 +304,9 @@ function zc-ls() {
         __convey_get_name_of_id "$idx"
         name="$REPLY"
 
+        busyfile="$ZCONVEY_OTHER_DIR/${idx}.busy"
+        [[ -e "$busyfile" && "$idx" != "$ZCONVEY_ID" ]] && busywith=" \033[1;33m(BUSY: $(<$busyfile))\033[0m"
+
         if [[ "$is_locked" = "0" && -n "$name" ]]; then
             print "\033[1;31m(ABSENT)  ID: $idx, NAME: $name\033[0m"
         elif [[ "$is_locked" = "0" && -z "$name" ]]; then
@@ -310,15 +314,15 @@ function zc-ls() {
             :
         elif [[ "$is_locked" = "1" && -z "$name" ]]; then
             if [ "$idx" = "$ZCONVEY_ID" ]; then
-                print "\033[1;32m(CURRENT) ID: $idx\033[0m"
+                print "\033[1;32m(CURRENT) ID: $idx\033[0m$busywith"
             else
-                print "(ON-LINE) ID: $idx"
+                print "(ON-LINE) ID: $idx$busywith"
             fi
         elif [[ "$is_locked" = "1" && -n "$name" ]]; then
             if [ "$idx" = "$ZCONVEY_ID" ]; then
-                print "\033[1;32m(CURRENT) ID: $idx, NAME: $name\033[0m"
+                print "\033[1;32m(CURRENT) ID: $idx, NAME: $name\033[0m$busywith"
             else
-                print "(ON-LINE) ID: $idx, NAME: $name"
+                print "(ON-LINE) ID: $idx, NAME: $name$busywith"
             fi
         fi
     done
