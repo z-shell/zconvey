@@ -511,7 +511,7 @@ function __convey_on_period_passed() {
 
     local -a commands
     commands=( "${(@f)"$(<$datafile)"}" )
-    rm -f "$datafile"
+    command rm -f "$datafile"
     exec {fd}<&-
 
     "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]} ##"
