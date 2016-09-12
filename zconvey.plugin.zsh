@@ -258,12 +258,13 @@ function zc() {
 
     print -r -- "$*" > "$datafile"
 
+    # Release the lock by closing the lock file
+    exec {fd}>&-
+
     if (( ${quiet} == 0 )); then
         pinfo2 "Zconvey successfully sent command to session $id"
     fi
 
-    # Release the lock by closing the lock file
-    exec {fd}>&-
 }
 
 function zc-ls() {
