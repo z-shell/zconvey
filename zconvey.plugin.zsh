@@ -429,8 +429,16 @@ fi
 
     integer idx try_id res
     local fd lockfile
-    
+
+    # Already assigned ID (inherited)?
     idx=0
+    if [[ "$ZCONVEY_FD" = <-> && "$ZCONVEY_FD" != "0" && "$ZCONVEY_ID" = <-> && "$ZCONVEY_ID" != "0" ]]; then
+        # Inherited FD and ID, no need to perform work
+        if print -u "$ZCONVEY_FD" -n 2>/dev/null; then
+            idx=101
+        fi
+    fi
+
     # Supported are 100 shells - acquire takes ~400ms max (zsystem's flock)
     for (( ; idx <= 100; idx ++ )); do
         # First (at first loop) try with $ZCONVEY_ID (the case of inherited ID)
