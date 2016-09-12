@@ -308,21 +308,21 @@ function zc-ls() {
         [[ -e "$busyfile" && "$idx" != "$ZCONVEY_ID" ]] && busywith=" \033[1;33m(BUSY: $(<$busyfile))\033[0m"
 
         if [[ "$is_locked" = "0" && -n "$name" ]]; then
-            print "\033[1;31m(ABSENT)  ID: $idx, NAME: $name\033[0m"
+            print "\033[1;31m(ABSENT)\033[0m  ID: $idx, NAME: $name"
         elif [[ "$is_locked" = "0" && -z "$name" ]]; then
             # Don't inform about absent, nameless sessions
             :
         elif [[ "$is_locked" = "1" && -z "$name" ]]; then
             if [ "$idx" = "$ZCONVEY_ID" ]; then
-                print "\033[1;32m(CURRENT) ID: $idx\033[0m$busywith"
+                print "\033[1;32m\033[4m(CURRENT) ID: $idx\033[0m$busywith"
             else
-                print "(ON-LINE) ID: $idx$busywith"
+                print "\033[1;33m(ON-LINE)\033[0m ID: $idx$busywith"
             fi
         elif [[ "$is_locked" = "1" && -n "$name" ]]; then
             if [ "$idx" = "$ZCONVEY_ID" ]; then
-                print "\033[1;32m(CURRENT) ID: $idx, NAME: $name\033[0m$busywith"
+                print "\033[1;32m\033[4m(CURRENT) ID: $idx, NAME: $name\033[0m$busywith"
             else
-                print "(ON-LINE) ID: $idx, NAME: $name$busywith"
+                print "\033[1;33m(ON-LINE)\033[0m ID: $idx, NAME: $name$busywith"
             fi
         fi
     done
