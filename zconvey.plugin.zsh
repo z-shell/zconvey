@@ -236,14 +236,14 @@ function zc() {
     # 1. Zsh lock with timeout (2 seconds)
     if (( ${ZCONVEY_CONFIG[use_zsystem_flock]} > 0 )); then
         (( ${verbose} )) && print "Will use zsystem flock..."
-        if ! zsystem flock -t 2 -f fd -r "$lockfile"; then
+        if ! zsystem flock -t 2 -f fd "$lockfile"; then
             pinfo2 "Communication channel of session $id is busy, could not send"
             return 1
         fi
     # 2. Provided flock binary (two calls)
     else
         (( ${verbose} )) && print "Will use provided flock..."
-        exec {fd}<"$lockfile"
+        exec {fd}>"$lockfile"
         "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
         if [ "$?" = "101" ]; then
             (( ${verbose} )) && print "First attempt failed, will retry..."
@@ -263,7 +263,7 @@ function zc() {
     fi
 
     # Release the lock by closing the lock file
-    exec {fd}<&-
+    exec {fd}>&-
 }
 
 function zc-ls() {
@@ -284,11 +284,10 @@ function zc-ls() {
         if [ -n "$idfile" ]; then
             # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
             if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-                zsystem flock -f tmpfd -r "$idfile"
+                zsystem flock -t 0 -f tmpfd "$idfile"
                 res="$?"
-                echo "zsystem"
             else
-                exec {tmpfd}<"$idfile"
+                exec {tmpfd}>"$idfile"
                 "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$tmpfd"
                 res="$?"
             fi
@@ -299,7 +298,7 @@ function zc-ls() {
             fi
 
             # Close the lock immediately
-            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ] && zsystem flock -u "$tmpfd" || exec {tmpfd}<&-
+            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ] && zsystem flock -u "$tmpfd" || exec {tmpfd}>&-
             tmpfd=""
         fi
 
@@ -431,27 +430,29 @@ fi
     integer idx try_id res
     local fd lockfile
     
+    idx=0
     # Supported are 100 shells - acquire takes ~400ms max (zsystem's flock)
-    for (( idx=0; idx <= 100; idx ++ )); do
+    for (( ; idx <= 100; idx ++ )); do
         # First (at first loop) try with $ZCONVEY_ID (the case of inherited ID)
         [[ "$idx" = "0" && "$ZCONVEY_ID" = <-> ]] && try_id="$ZCONVEY_ID" || try_id="$idx"
         [[ "$try_id" = "0" ]] && continue
 
         lockfile="${ZCONVEY_LOCKS_DIR}/zsh_nr${try_id}"
-        command touch "$lockfile"
+        echo "Lock done by Zsh (PID $$)" > "$lockfile"
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
+        # -e: preserve file descriptor on exec
         if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-            zsystem flock -f ZCONVEY_FD -r "$lockfile"
+            zsystem flock -t 0 -f ZCONVEY_FD -e "$lockfile"
             res="$?"
         else
-            exec {ZCONVEY_FD}<"$lockfile"
+            exec {ZCONVEY_FD}>"$lockfile"
             "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$ZCONVEY_FD"
             res="$?"
         fi
 
         if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
-            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" != "1" ] && exec {ZCONVEY_FD}<&-
+            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" != "1" ] && exec {ZCONVEY_FD}>&-
 
             # Is this the special case, i.e. inherition of ZCONVEY_ID?
             # In this case being unable to lock means: we already have
@@ -460,8 +461,8 @@ fi
             if [[ "$idx" = "0" ]]; then
                 # Export again just to be sure
                 export ZCONVEY_ID
-                # We will not be able to quick-close FD on zshexit
-                ZCONVEY_FD=0
+                # We will not be able and want to close FD on zshexit
+                export ZCONVEY_FD=0
                 break
             fi
         else
@@ -470,18 +471,20 @@ fi
             # it's not inherited (i.e. not already locked by ourselves)
             if [[ "$idx" = "0" ]]; then
                 # Release the out of order lock
-                exec {ZCONVEY_FD}<&-
+                exec {ZCONVEY_FD}>&-
                 # We will not be able to quick-close FD on zshexit
                 ZCONVEY_FD=0
             else
                 ZCONVEY_ID=try_id
-                # ID will be inherited by subshells and exec zsh calls
+                # ID and FD will be inherited by subshells and exec zsh calls
                 export ZCONVEY_ID
+                export ZCONVEY_FD
                 break
             fi
         fi
     done
 
+    # Show what is resolved (ID and possibly a NAME)
     zc-id
 }
 
@@ -513,12 +516,12 @@ function __convey_on_period_passed() {
     command touch "$lockfile"
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
     if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-        if ! zsystem flock -t 0 -f fd -r "$lockfile"; then
+        if ! zsystem flock -t 0 -f fd "$lockfile"; then
             LANG=C sleep 0.11
-            if ! zsystem flock -t 0 -f fd -r "$lockfile"; then
+            if ! zsystem flock -t 0 -f fd "$lockfile"; then
                 # Examine the situation by waiting long
-                LANG=C sleep 0.5
-                if ! zsystem flock -t 1 -f fd -r "$lockfile"; then
+                LANG=C sleep 0.11
+                if ! zsystem flock -t 0 -f fd "$lockfile"; then
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
@@ -528,7 +531,7 @@ function __convey_on_period_passed() {
         fi
     # 2. Zsh < 5.3 flock that isn't non-blocking
     elif [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "2" ]; then
-        if ! zsystem flock -t 2 -f fd -r "$lockfile"; then
+        if ! zsystem flock -t 1 -f fd "$lockfile"; then
             # Waited too long, lock must be broken, remove it
             command rm -f "$lockfile"
             # Will handle this input at next call
@@ -536,7 +539,7 @@ function __convey_on_period_passed() {
         fi
     # 3. Provided flock binary
     else
-        exec {fd}<"$lockfile"
+        exec {fd}>"$lockfile"
         "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
         if [ "$?" = "101" ]; then
             LANG=C sleep 0.11
@@ -558,7 +561,7 @@ function __convey_on_period_passed() {
     local -a commands
     commands=( "${(@f)"$(<$datafile)"}" )
     command rm -f "$datafile"
-    exec {fd}<&-
+    exec {fd}>&-
 
     "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]} ##"
 
@@ -604,7 +607,7 @@ __convey_precmd_hook() {
 # Not called ideally at say SIGTERM, but
 # at least when "exit" is enterred
 function __convey_zshexit() {
-    [ "$ZCONVEY_FD" != "0" ] && exec {ZCONVEY_FD}<&-
+    [[ "$ZCONVEY_FD" != "0" && "$SHLVL" = "1" ]] && exec {ZCONVEY_FD}>&-
 }
 
 if ! type sched 2>/dev/null 1>&2; then
