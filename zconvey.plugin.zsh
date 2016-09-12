@@ -83,7 +83,7 @@ function __convey_usage_zc-rename() {
 }
 
 function zc-rename() {
-    setopt localoptions extendedglob
+    setopt localoptions extendedglob clobber
 
     local -A opthash
     zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __convey_usage_zc-rename; return 1; }
@@ -159,7 +159,7 @@ function __convey_usage_zc() {
 }
 
 function zc() {
-    setopt localoptions extendedglob
+    setopt localoptions extendedglob clobber
 
     local -A opthash
     zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: zs -zshselect || { __convey_usage_zc; return 1; }
@@ -267,6 +267,7 @@ function zc() {
 }
 
 function zc-ls() {
+    setopt localoptions extendedglob clobber
     integer idx is_locked
     local idfile tmpfd name busyfile busywith
 
@@ -440,7 +441,7 @@ if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
 fi
 
 () {
-    setopt localoptions extendedglob
+    setopt localoptions extendedglob clobber
 
     integer idx try_id res
     local fd lockfile
@@ -530,6 +531,7 @@ function __convey_on_period_passed() {
 
     # ..and block Ctrl-C, this function will not stall
     setopt localtraps; trap '' INT
+    setopt localoptions extendedglob clobber
 
     local fd datafile="${ZCONVEY_IO_DIR}/${ZCONVEY_ID}.io"
     local lockfile="${datafile}.lock"
@@ -616,7 +618,7 @@ __convey_preexec_hook() {
     fi
 
     # Mark that the shell is busy
-    print -r -- "${1[(w)1]}" > "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
+    print -r -- "${1[(w)1]}" >! "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
 }
 
 # A hook marking the shell as not busy
