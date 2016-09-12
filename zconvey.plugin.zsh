@@ -421,6 +421,8 @@ fi
             if [[ "$idx" = "0" ]]; then
                 # Export again just to be sure
                 export ZCONVEY_ID
+                # We will not be able to quick-close FD on zshexit
+                ZCONVEY_FD=0
                 break
             fi
         else
@@ -430,6 +432,8 @@ fi
             if [[ "$idx" = "0" ]]; then
                 # Release the out of order lock
                 exec {ZCONVEY_FD}<&-
+                # We will not be able to quick-close FD on zshexit
+                ZCONVEY_FD=0
             else
                 ZCONVEY_ID=try_id
                 # ID will be inherited by subshells and exec zsh calls
@@ -525,7 +529,7 @@ function __convey_on_period_passed() {
 # Not called ideally at say SIGTERM, but
 # at least when "exit" is enterred
 function __convey_zshexit() {
-    exec {ZCONVEY_FD}<&-
+    [ "$ZCONVEY_FD" != "0" ] && exec {ZCONVEY_FD}<&-
 }
 
 if ! type sched 2>/dev/null 1>&2; then
