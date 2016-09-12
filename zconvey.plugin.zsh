@@ -340,9 +340,11 @@ function zc-id() {
 
 # Prints a graphical "logo" with ID and NAME
 function zc-id-logo() {
+    setopt localoptions extendedglob
+
     integer halfl=$(( LINES / 2 )) halfc=$(( COLUMNS / 2 ))
     integer hlen tlen
-    local text headerline=""
+    local text headerline=" Zconvey" headerline2=""
 
     __convey_get_name_of_id "$ZCONVEY_ID"
     if [ -z "$REPLY" ]; then
@@ -352,16 +354,24 @@ function zc-id-logo() {
     fi
     tlen="${#text}"
     hlen=tlen+4
-    headerline="${(l:hlen:: :)headerline}"
+    headerline="${(r:hlen:: :)headerline}"
+    headerline="${headerline/Zconvey/\033[1;34mZconvey\033[0m\033[1;44m}"
+    headerline2="${(r:hlen:: :)headerline2}"
+    text="${text/(#b)(<[[:digit:]]#>)/\033[1;32m${match[1]}\033[1;33m}"
+    text="${text/(#b)NAME: (?#)/NAME: \033[1;32m${match[1]}\033[0m}"
 
-    echotc sc
-    echotc cm $(( halfl - 3 )) $(( halfc - hlen/2 ))
-    print -n "\033[1;42m$headerline\033[0m"
-    echotc cm $(( halfl - 2 )) $(( halfc - hlen/2 ))
-    print -n "\033[1;42m \033[0m \033[1;33m$text\033[0m \033[1;42m \033[0m"
-    echotc cm $(( halfl - 1 )) $(( halfc - hlen/2 ))
-    print -n "\033[1;42m$headerline\033[0m"
-    echotc rc
+    [ "$1" != "echo" ] && {
+        echotc sc
+        echotc cm $(( halfl - 3 )) $(( halfc - hlen/2 ))
+        print -n "\033[1;44m$headerline\033[0m"
+        echotc cm $(( halfl - 2 )) $(( halfc - hlen/2 ))
+        print -n "\033[1;44m \033[0m \033[1;33m$text\033[0m \033[1;44m \033[0m"
+        echotc cm $(( halfl - 1 )) $(( halfc - hlen/2 ))
+        print -n "\033[1;44m$headerline2\033[0m"
+        echotc rc
+    } || {
+        print "\033[1;44m$headerline\033[0m\n\033[1;44m \033[0m \033[1;33m$text\033[0m \033[1;44m \033[0m\n\033[1;44m$headerline2\033[0m"
+    }
 }
 
 #
