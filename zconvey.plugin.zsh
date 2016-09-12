@@ -532,6 +532,22 @@ function __convey_on_period_passed() {
 }
 
 #
+# Preexec hooks
+#
+
+# A hook detecting failure in re-scheduling
+__convey_preexec_hook() {
+    # No periodic run for a long time -> schedule
+    if (( SECONDS - ZCONVEY_RUN_SECONDS >= 4 )); then
+        # Simulate that __convey_on_period_passed
+        # was just ran and re-scheduled
+        ZCONVEY_RUN_SECONDS="$SECONDS"
+        # Schedule
+        sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+    fi
+}
+
+#
 # Schedule, other
 #
 
@@ -551,3 +567,4 @@ fi
 sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 autoload -Uz add-zsh-hook
 add-zsh-hook zshexit __convey_zshexit
+add-zsh-hook preexec __convey_preexec_hook
