@@ -30,6 +30,7 @@ typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
 typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
 typeset -ghH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
 typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
+typeset -ghH ZCONVEY_SCHEDULE_ORIGIN
 command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$ZCONVEY_OTHER_DIR"
 
 #
@@ -459,7 +460,10 @@ fi
 function __convey_on_period_passed() {
     # Reschedule as quickly as possible - user might
     # press Ctrl-C when function will be working
-    sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+    #
+    # Reschedule only if this scheduling sequence
+    # comes from approved single origin
+    [[ "$ZCONVEY_SCHEDULE_ORIGIN" = "$1" ]] && sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
 
     # Remember when the command was run to detect a possible
     # fail in schedule (because of unlucky Ctrl-C press)
@@ -542,11 +546,14 @@ function __convey_on_period_passed() {
 __convey_preexec_hook() {
     # No periodic run for a long time -> schedule
     if (( SECONDS - ZCONVEY_RUN_SECONDS >= 4 )); then
-        # Simulate that __convey_on_period_passed
-        # was just ran and re-scheduled
+        # Simulate that __convey_on_period_passed was just
+        # ran and did re-schedule
         ZCONVEY_RUN_SECONDS="$SECONDS"
-        # Schedule
-        sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+
+        # Schedule with new schedule origin - any duplicate
+        # scheduling sequence will be quickly eradicated
+        ZCONVEY_SCHEDULE_ORIGIN="$SECONDS"
+        sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
     fi
 
     # Mark that the shell is busy
@@ -575,7 +582,8 @@ if ! type sched 2>/dev/null 1>&2; then
     fi
 fi
 
-sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+ZCONVEY_SCHEDULE_ORIGIN="$SECONDS"
+sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
 autoload -Uz add-zsh-hook
 add-zsh-hook zshexit __convey_zshexit
 add-zsh-hook preexec __convey_preexec_hook
