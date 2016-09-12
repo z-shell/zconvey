@@ -28,8 +28,9 @@ typeset -ghH ZCONVEY_FD
 typeset -ghH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
 typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
 typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -ghH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
 typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
-command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR"
+command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$ZCONVEY_OTHER_DIR"
 
 #
 # Helper functions
@@ -535,7 +536,9 @@ function __convey_on_period_passed() {
 # Preexec hooks
 #
 
-# A hook detecting failure in re-scheduling
+# A hook:
+# - detecting failure in re-scheduling
+# - marking the shell as busy
 __convey_preexec_hook() {
     # No periodic run for a long time -> schedule
     if (( SECONDS - ZCONVEY_RUN_SECONDS >= 4 )); then
@@ -545,6 +548,14 @@ __convey_preexec_hook() {
         # Schedule
         sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
     fi
+
+    # Mark that the shell is busy
+    print -r -- "${1[(w)1]}" > "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
+}
+
+# A hook marking the shell as not busy
+__convey_precmd_hook() {
+    command rm -f "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
 }
 
 #
@@ -568,3 +579,4 @@ sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
 autoload -Uz add-zsh-hook
 add-zsh-hook zshexit __convey_zshexit
 add-zsh-hook preexec __convey_preexec_hook
+add-zsh-hook precmd __convey_precmd_hook
