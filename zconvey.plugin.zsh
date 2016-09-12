@@ -208,7 +208,7 @@ function zc() {
                 pinfo "No selection, exiting"
                 return 0
             else
-                id="${id//(#b)*ID: ([[:digit:]]#),*/$match[1]}"
+                id="${id//(#b)*ID: ([[:digit:]]#)[^[:digit:]]#*(#e)/$match[1]}"
             fi
         fi
     fi
