@@ -328,6 +328,7 @@ typeset -ghH ZCONVEY_FD
 typeset -ghH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
 typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
 typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
 command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR"
 
 () {
@@ -454,6 +455,10 @@ function __convey_on_period_passed() {
     # Reschedule as quickly as possible - user might
     # press Ctrl-C when function will be working
     sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed
+
+    # Remember when the command was run to detect a possible
+    # fail in schedule (because of unlucky Ctrl-C press)
+    ZCONVEY_RUN_SECONDS="$SECONDS"
 
     # ..and block Ctrl-C, this function will not stall
     setopt localtraps; trap '' INT
