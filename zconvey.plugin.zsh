@@ -391,6 +391,11 @@ function zc-id-logo() {
     zstyle -b ":plugin:zconvey" use_zsystem_flock use_zsystem_flock || use_zsystem_flock="yes"
     [ "$use_zsystem_flock" = "yes" ] && use_zsystem_flock="1" || use_zsystem_flock="0"
     ZCONVEY_CONFIG[use_zsystem_flock]="$use_zsystem_flock"
+
+    local greeting
+    zstyle -s ":plugin:zconvey" greeting greeting || greeting="logo"
+    [[ "$greeting" != "none" && "$greeting" != "text" && "$greeting" != "logo" ]] && greeting="logo"
+    ZCONVEY_CONFIG[greeting]="$greeting"
 }
 
 #
@@ -503,7 +508,8 @@ fi
     done
 
     # Show what is resolved (ID and possibly a NAME)
-    zc-id
+    [ "$ZCONVEY_CONFIG[greeting]" = "logo" ] && zc-id-logo echo
+    [ "$ZCONVEY_CONFIG[greeting]" = "text" ] && zc-id
 }
 
 #
