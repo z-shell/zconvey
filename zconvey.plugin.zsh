@@ -217,6 +217,7 @@ function zc() {
         if ! type zsh-select 2>/dev/null 1>&2; then
             pinfo "Zsh-Select not installed, please install it first, aborting"
         else
+            export ZSELECT_START_IN_SEARCH_MODE=0
             id=`zc-ls | zsh-select`
             if [ -z "$id" ]; then
                 pinfo "No selection, exiting"
