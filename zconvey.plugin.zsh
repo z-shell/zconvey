@@ -20,6 +20,18 @@ if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$ZCONVEY_REPO_DIR]}" != $ZCONVEY_REPO
 fi
 
 #
+# Global variables
+#
+
+typeset -gi ZCONVEY_ID
+typeset -ghH ZCONVEY_FD
+typeset -ghH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
+typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
+command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR"
+
+#
 # Helper functions
 #
 
@@ -322,14 +334,6 @@ function zc-id() {
 #
 # Load configuration
 #
-
-typeset -gi ZCONVEY_ID
-typeset -ghH ZCONVEY_FD
-typeset -ghH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
-typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
-typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
-command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR"
 
 () {
     setopt localoptions extendedglob
