@@ -595,7 +595,7 @@ function zc-logo-all() {
                 print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
             else
                 counter+=1
-                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" 'zc-logo && sleep 20'
+                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" zc-logo \&\& sleep 20
             fi
         fi
     done
