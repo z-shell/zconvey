@@ -69,6 +69,40 @@ function __convey_get_name_of_id() {
     fi
 }
 
+function __convey_is_session_active() {
+        setopt localoptions extendedglob
+        local idx="$1"
+
+        if [[ "$idx" != <-> || "$idx" = "0" || "$idx" -gt "100" ]]; then
+            pinfo "Incorrect sesion ID occured: $idx"
+            return 2
+        fi
+
+        integer is_locked=0
+        local idfile="$ZCONVEY_LOCKS_DIR/zsh_nr${idx}" tmpfd
+
+        if [ -e "$idfile" ]; then
+            # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
+            if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+                zsystem flock -t 0 -f tmpfd "$idfile"
+                res="$?"
+            else
+                exec {tmpfd}>"$idfile"
+                "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$tmpfd"
+                res="$?"
+            fi
+
+            if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
+                is_locked=1
+            fi
+
+            # Close the lock immediately
+            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ] && zsystem flock -u "$tmpfd" || exec {tmpfd}>&-
+        fi
+
+        return $(( 1-is_locked ))
+}
+
 #
 # User functions
 #
