@@ -305,7 +305,7 @@ function zc-take() {
 
 function __convey_usage_zc() {
     pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
-    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask]"
+    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask] COMMAND ARGUMENT ..."
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
     print -- "-n NAME / --name NAME    - NAME of Zsh session"
@@ -353,14 +353,19 @@ function zc() {
         return 1
     fi
 
+    local cmd="$*"
+    cmd="${cmd##[[:space:]]#}"
+    cmd="${cmd%%[[:space:]]#}"
+
+    if [[ -z "$cmd" && "$ask" = "0" ]]; then
+        __convey_usage_zc
+        return 1
+    fi
+
     if [[ "$have_id" = "0" && "$have_name" = "0" && "$ask" = "0" ]]; then
         pinfo "Either supply target ID/NAME or request Zsh-Select (-a/--ask)"
         return 1
     fi
-
-    local cmd="$*"
-    cmd="${cmd##[[:space:]]#}"
-    cmd="${cmd%%[[:space:]]#}"
 
     # Resolve name
     if (( $have_name )); then
