@@ -336,8 +336,13 @@ function zc() {
     (( ${+opthash[-n]} )) && name="${opthash[-n]}"
     (( ${+opthash[--name]} )) && name="${opthash[--name]}"
 
-    # ZSH-SELECT (for acquiring ID)
+    # ASK (requests command and/or ID)
     (( ask = ${+opthash[-a]} + ${+opthash[--ask]} ))
+    if [ "$ask" = "0" ]; then
+        local ask_setting
+        zstyle -b ":plugin:zconvey" ask ask_setting || ask_setting="no"
+        [ "$ask_setting" = "yes" ] && ask=1 || ask=0
+    fi
 
     # VERBOSE, QUIET
     (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
