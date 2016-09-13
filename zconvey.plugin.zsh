@@ -475,6 +475,8 @@ function zc() {
 
     if (( ${quiet} == 0 )); then
         pinfo2 "Zconvey successfully sent command to session $id"
+        local busyfile="$ZCONVEY_OTHER_DIR/${id}.busy"
+        [ -e "$busyfile" ] && print "The session is busy \033[1;33m($(<$busyfile))\033[0m"
     fi
 
 }
