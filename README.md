@@ -1,5 +1,10 @@
 ## Introduction
 
+Zconvey integrates multiple Zsh sessions. They are given an ID, optionally a NAME, and can
+send commands to each other.
+
+[![asciicast](https://asciinema.org/a/ayklrum7g4ut2hpt7mg6j0nzj.png)](https://asciinema.org/a/ayklrum7g4ut2hpt7mg6j0nzj)
+
 ## Zstyles
 
 The values being set are the defaults.
