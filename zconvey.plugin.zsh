@@ -159,7 +159,7 @@ function zc-rename() {
 
 function __convey_usage_zc-take() {
     pinfo2 "Takes a name for current Zsh session, i.e. takes it away from any other session if needed"
-    pinfo2 "You can take a name for other session if -i or -n is provided"
+    pinfo2 "You can take a name for other session (not the current one) if -i or -n is provided"
     pinfo "Usage: zc-take [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
@@ -177,8 +177,8 @@ function zc-take() {
     local id name new_name="$1"
 
     # Help
-    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc-rename; return 0; }
-    [ -z "$new_name" ] && { echo "No new name given"; __convey_usage_zc-rename; return 1; }
+    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc-take; return 0; }
+    [ -z "$new_name" ] && { echo "No new name given"; __convey_usage_zc-take; return 1; }
 
     # ID
     have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
@@ -190,8 +190,7 @@ function zc-take() {
     (( ${+opthash[-n]} )) && name="${opthash[-n]}"
     (( ${+opthash[--name]} )) && name="${opthash[--name]}"
 
-    # VERBOSE, QUIET
-    (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
+    # QUIET
     (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 
     if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
@@ -213,17 +212,43 @@ function zc-take() {
             return 1
         fi
 
-        __convey_resolve_name_to_id "$new_name"
-        if [ -n "$REPLY" ]; then
-            echo "A session already has target name: \`$new_name' (its ID: $REPLY)"
-            return 1
-        fi
-
         # Store the resolved ID and continue normally,
         # with ID as the main specifier of session
         id="$resolved"
     elif (( $have_id == 0 )); then
         id="$ZCONVEY_ID"
+    fi
+
+    if [[ "$id" != <-> || "$id" = "0" ]]; then
+        pinfo "Bad ID ($id), aborting"
+        return 1
+    fi
+
+    if [[ "$id" -gt "100" ]]; then
+        pinfo "Maximum nr of sessions is 100, aborting"
+        return 1
+    fi
+
+    __convey_resolve_name_to_id "$new_name"
+    local other_id="$REPLY"
+    if [ -n "$other_id" ]; then
+        # The new name exist in system - find an
+        # altered name that doesn't exist in system
+        # and rename conflicting session, so that
+        # $new_name is free
+        integer counter=1
+        local subst_name
+        while (( 1 )); do
+            counter+=1
+            subst_name="${new_name}${counter}"
+            __convey_resolve_name_to_id "$subst_name"
+            if [ -z "$REPLY" ]; then
+                # Found a name that doesn't exist in system, assign
+                # it to the initial conflicting session $new_name
+                print ":$subst_name:" > "$ZCONVEY_NAMES_DIR"/"$other_id".name
+                break
+            fi
+        done
     fi
 
     print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
