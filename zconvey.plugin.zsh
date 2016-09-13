@@ -426,39 +426,13 @@ function zc() {
 function zc-ls() {
     setopt localoptions extendedglob clobber
     integer idx is_locked
-    local idfile tmpfd name busyfile busywith
+    local name busyfile busywith
 
     for (( idx = 1; idx <= 100; idx ++ )); do
-        idfile=""
-        tmpfd=""
         name=""
         busywith=""
-        is_locked=0
 
-        if [ -e "$ZCONVEY_LOCKS_DIR/zsh_nr${idx}" ]; then
-            idfile="$ZCONVEY_LOCKS_DIR/zsh_nr${idx}"
-        fi
-
-        if [ -n "$idfile" ]; then
-            # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
-            if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-                zsystem flock -t 0 -f tmpfd "$idfile"
-                res="$?"
-            else
-                exec {tmpfd}>"$idfile"
-                "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$tmpfd"
-                res="$?"
-            fi
-
-            is_locked=0
-            if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
-                is_locked=1
-            fi
-
-            # Close the lock immediately
-            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ] && zsystem flock -u "$tmpfd" || exec {tmpfd}>&-
-            tmpfd=""
-        fi
+        __convey_is_session_active "$idx" && is_locked=1 || is_locked=0
 
         __convey_get_name_of_id "$idx"
         name="$REPLY"
