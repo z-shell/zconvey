@@ -320,7 +320,7 @@ function zc() {
     local -A opthash
     zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: a -ask || { __convey_usage_zc; return 1; }
 
-    integer have_id=0 have_name=0 verbose=0 quiet=0 zshselect=0
+    integer have_id=0 have_name=0 verbose=0 quiet=0 zshselect=0 ask=0
     local id name
 
     # Help
