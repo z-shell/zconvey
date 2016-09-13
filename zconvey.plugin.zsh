@@ -127,17 +127,17 @@ function zc-rename() {
             return 1
         fi
 
-        __convey_resolve_name_to_id "$new_name"
-        if [ -n "$REPLY" ]; then
-            pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
-            return 1
-        fi
-
         # Store the resolved ID and continue normally,
         # with ID as the main specifier of session
         id="$resolved"
     elif (( $have_id == 0 )); then
         id="$ZCONVEY_ID"
+    fi
+
+    __convey_resolve_name_to_id "$new_name"
+    if [ -n "$REPLY" ]; then
+        pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
+        return 1
     fi
 
     if [[ "$id" != <-> || "$id" = "0" ]]; then
