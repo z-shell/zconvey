@@ -45,7 +45,7 @@ function pinfo2() {
     print -- "\033[1;33m$*\033[0m";
 }
 
-function __convey_resolve_name_to_id() {
+function __zconvey_resolve_name_to_id() {
     local name="$1"
 
     REPLY=""
@@ -57,7 +57,7 @@ function __convey_resolve_name_to_id() {
     done
 }
 
-function __convey_get_name_of_id() {
+function __zconvey_get_name_of_id() {
     local id="$1"
 
     REPLY=""
@@ -69,7 +69,7 @@ function __convey_get_name_of_id() {
     fi
 }
 
-function __convey_is_session_active() {
+function __zconvey_is_session_active() {
         setopt localoptions extendedglob
         local idx="$1"
 
@@ -107,7 +107,7 @@ function __convey_is_session_active() {
 # User functions
 #
 
-function __convey_usage_zc-rename() {
+function __zconvey_usage_zc-rename() {
     pinfo2 "Renames current Zsh session, or one given via ID or (old) NAME"
     pinfo "Usage: zc-rename [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
     print -- "-h/--help                - this message"
@@ -120,14 +120,14 @@ function zc-rename() {
     setopt localoptions extendedglob clobber
 
     local -A opthash
-    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __convey_usage_zc-rename; return 1; }
+    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __zconvey_usage_zc-rename; return 1; }
 
     integer have_id=0 have_name=0 quiet=0
     local id name new_name="$1"
 
     # Help
-    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc-rename; return 0; }
-    [ -z "$new_name" ] && { echo "No new name given"; __convey_usage_zc-rename; return 1; }
+    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zconvey_usage_zc-rename; return 0; }
+    [ -z "$new_name" ] && { echo "No new name given"; __zconvey_usage_zc-rename; return 1; }
 
     # ID
     have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
@@ -154,7 +154,7 @@ function zc-rename() {
 
     # Rename via NAME?
     if (( $have_name )); then
-        __convey_resolve_name_to_id "$name"
+        __zconvey_resolve_name_to_id "$name"
         local resolved="$REPLY"
         if [ -z "$resolved" ]; then
             pinfo "Could not find session named: \`$name'"
@@ -168,7 +168,7 @@ function zc-rename() {
         id="$ZCONVEY_ID"
     fi
 
-    __convey_resolve_name_to_id "$new_name"
+    __zconvey_resolve_name_to_id "$new_name"
     if [ -n "$REPLY" ]; then
         pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
         return 1
@@ -195,7 +195,7 @@ function zc-rename() {
     [ "$ls_after_rename" = "yes" ] && print && zc-ls
 }
 
-function __convey_usage_zc-take() {
+function __zconvey_usage_zc-take() {
     pinfo2 "Takes a name for current Zsh session, i.e. takes it away from any other session if needed"
     pinfo2 "You can take a name for other session (not the current one) if -i or -n is provided"
     pinfo "Usage: zc-take [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
@@ -209,14 +209,14 @@ function zc-take() {
     setopt localoptions extendedglob clobber
 
     local -A opthash
-    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __convey_usage_zc-rename; return 1; }
+    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __zconvey_usage_zc-rename; return 1; }
 
     integer have_id=0 have_name=0 quiet=0
     local id name new_name="$1"
 
     # Help
-    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc-take; return 0; }
-    [ -z "$new_name" ] && { echo "No new name given"; __convey_usage_zc-take; return 1; }
+    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zconvey_usage_zc-take; return 0; }
+    [ -z "$new_name" ] && { echo "No new name given"; __zconvey_usage_zc-take; return 1; }
 
     # ID
     have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
@@ -243,7 +243,7 @@ function zc-take() {
 
     # Rename via NAME?
     if (( $have_name )); then
-        __convey_resolve_name_to_id "$name"
+        __zconvey_resolve_name_to_id "$name"
         local resolved="$REPLY"
         if [ -z "$resolved" ]; then
             echo "Could not find session named: \`$name'"
@@ -267,7 +267,7 @@ function zc-take() {
         return 1
     fi
 
-    __convey_resolve_name_to_id "$new_name"
+    __zconvey_resolve_name_to_id "$new_name"
     local other_id="$REPLY"
     if [ -n "$other_id" ]; then
         # The new name exist in system - find an
@@ -279,7 +279,7 @@ function zc-take() {
         while (( 1 )); do
             counter+=1
             subst_name="${new_name%%_[[:digit:]]#}_${counter}"
-            __convey_resolve_name_to_id "$subst_name"
+            __zconvey_resolve_name_to_id "$subst_name"
             if [ -z "$REPLY" ]; then
                 # Found a name that doesn't exist in system, assign
                 # it to the initial conflicting session $new_name
@@ -303,7 +303,7 @@ function zc-take() {
     [ "$ls_after_rename" = "yes" ] && print && zc-ls
 }
 
-function __convey_usage_zc() {
+function __zconvey_usage_zc() {
     pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
     pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask] COMMAND ARGUMENT ..."
     print -- "-h/--help                - this message"
@@ -318,13 +318,13 @@ function zc() {
     setopt localoptions extendedglob clobber
 
     local -A opthash
-    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: a -ask || { __convey_usage_zc; return 1; }
+    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: a -ask || { __zconvey_usage_zc; return 1; }
 
     integer have_id=0 have_name=0 verbose=0 quiet=0 zshselect=0 ask=0
     local id name
 
     # Help
-    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __convey_usage_zc; return 0; }
+    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zconvey_usage_zc; return 0; }
 
     # ID
     have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
@@ -363,7 +363,7 @@ function zc() {
     cmd="${cmd%%[[:space:]]#}"
 
     if [[ -z "$cmd" && "$ask" = "0" ]]; then
-        __convey_usage_zc
+        __zconvey_usage_zc
         return 1
     fi
 
@@ -374,7 +374,7 @@ function zc() {
 
     # Resolve name
     if (( $have_name )); then
-        __convey_resolve_name_to_id "$name"
+        __zconvey_resolve_name_to_id "$name"
         local resolved="$REPLY"
         if [ -z "$resolved" ]; then
             echo "Could not find session named: \`$name'"
@@ -490,9 +490,9 @@ function zc-ls() {
         name=""
         busywith=""
 
-        __convey_is_session_active "$idx" && is_locked=1 || is_locked=0
+        __zconvey_is_session_active "$idx" && is_locked=1 || is_locked=0
 
-        __convey_get_name_of_id "$idx"
+        __zconvey_get_name_of_id "$idx"
         name="$REPLY"
 
         busyfile="$ZCONVEY_OTHER_DIR/${idx}.busy"
@@ -520,7 +520,7 @@ function zc-ls() {
 }
 
 function zc-id() {
-    __convey_get_name_of_id "$ZCONVEY_ID"
+    __zconvey_get_name_of_id "$ZCONVEY_ID"
     if [ -z "$REPLY" ]; then
         print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m (no name assigned)";
     else
@@ -536,7 +536,7 @@ function zc-logo() {
     integer hlen tlen
     local text headerline=" Zconvey" headerline2=""
 
-    __convey_get_name_of_id "$ZCONVEY_ID"
+    __zconvey_get_name_of_id "$ZCONVEY_ID"
     if [ -z "$REPLY" ]; then
         text="ID: <$ZCONVEY_ID> NAME: (no name assigned)"
     else
@@ -579,14 +579,14 @@ function zc-logo-all() {
         busywith=""
         is_locked=0
 
-        __convey_is_session_active "$idx" && is_locked=1 || is_locked=0
+        __zconvey_is_session_active "$idx" && is_locked=1 || is_locked=0
 
         if (( is_locked )); then
             busyfile="$ZCONVEY_OTHER_DIR/${idx}.busy"
             if [[ -e "$busyfile" && "$idx" != "$ZCONVEY_ID" ]]; then
                 busywith="\033[1;33m$(<$busyfile)\033[0m"
 
-                __convey_get_name_of_id "$idx"
+                __zconvey_get_name_of_id "$idx"
                 print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
             else
                 counter+=1
@@ -763,26 +763,26 @@ fi
 # Function to paste to command line, used when zle is active
 #
 
-function __convey_zle_paster() {
+function __zconvey_zle_paster() {
     zle .kill-buffer
     LBUFFER+="$*"
     zle .redisplay
     zle .accept-line
 }
 
-zle -N __convey_zle_paster
+zle -N __zconvey_zle_paster
 
 #
 # Function to check for input commands
 #
 
-function __convey_on_period_passed() {
+function __zconvey_on_period_passed() {
     # Reschedule as quickly as possible - user might
     # press Ctrl-C when function is executing
     #
     # Reschedule only if this scheduling sequence
     # comes from approved single origin
-    [[ "$ZCONVEY_SCHEDULE_ORIGIN" = "$1" ]] && sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
+    [[ "$ZCONVEY_SCHEDULE_ORIGIN" = "$1" ]] && sched +"${ZCONVEY_CONFIG[check_interval]}" __zconvey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
 
     # ..and block Ctrl-C, this function will not
     # stall, no reason for someone to use Ctrl-C
@@ -878,7 +878,7 @@ function __convey_on_period_passed() {
         # Two available methods of outputting the command
         if [ "${ZCONVEY_CONFIG[output_method]}" = "zsh" ]; then
             if zle; then
-                zle __convey_zle_paster "$concat_command"
+                zle __zconvey_zle_paster "$concat_command"
             else
                 print -zr "$concat_command"
             fi
@@ -900,17 +900,17 @@ function __convey_on_period_passed() {
 # A hook:
 # - detecting failure in re-scheduling
 # - marking the shell as busy
-__convey_preexec_hook() {
+__zconvey_preexec_hook() {
     # No periodic run for a long time -> schedule
     if (( SECONDS - ZCONVEY_RUN_SECONDS >= 4 )); then
-        # Simulate that __convey_on_period_passed was just
+        # Simulate that __zconvey_on_period_passed was just
         # ran and did re-schedule
         ZCONVEY_RUN_SECONDS="$SECONDS"
 
         # Schedule with new schedule origin - any duplicate
         # scheduling sequence will be quickly eradicated
         ZCONVEY_SCHEDULE_ORIGIN="$SECONDS"
-        sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
+        sched +"${ZCONVEY_CONFIG[check_interval]}" __zconvey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
     fi
 
     # Mark that the shell is busy
@@ -918,7 +918,7 @@ __convey_preexec_hook() {
 }
 
 # A hook marking the shell as not busy
-__convey_precmd_hook() {
+__zconvey_precmd_hook() {
     command rm -f "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
 }
 
@@ -928,7 +928,7 @@ __convey_precmd_hook() {
 
 # Not called ideally at say SIGTERM, but
 # at least when "exit" is enterred
-function __convey_zshexit() {
+function __zconvey_zshexit() {
     [[ "$ZCONVEY_FD" != "0" && "$SHLVL" = "1" ]] && exec {ZCONVEY_FD}>&-
 }
 
@@ -940,11 +940,11 @@ if ! type sched 2>/dev/null 1>&2; then
 fi
 
 ZCONVEY_SCHEDULE_ORIGIN="$SECONDS"
-sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
+sched +"${ZCONVEY_CONFIG[check_interval]}" __zconvey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
 autoload -Uz add-zsh-hook
-add-zsh-hook zshexit __convey_zshexit
-add-zsh-hook preexec __convey_preexec_hook
-add-zsh-hook precmd __convey_precmd_hook
+add-zsh-hook zshexit __zconvey_zshexit
+add-zsh-hook preexec __zconvey_preexec_hook
+add-zsh-hook precmd __zconvey_precmd_hook
 
 zle -N zc-logo
 bindkey '^O^I' zc-logo
