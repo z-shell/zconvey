@@ -22,7 +22,7 @@ fi
 #
 # Autoloads
 #
-autoload zc zc-rename zc-take zc-ls
+autoload zc zc-rename zc-take zc-ls zc-logo
 
 #
 # Global variables
@@ -122,42 +122,6 @@ function zc-id() {
     else
         print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m, name: \033[1;33m${REPLY}\033[0m";
     fi
-}
-
-# Prints a graphical "logo" with ID and NAME
-function zc-logo() {
-    setopt localoptions extendedglob
-
-    integer halfl=$(( LINES / 2 )) halfc=$(( COLUMNS / 2 ))
-    integer hlen tlen
-    local text headerline=" Zconvey" headerline2=""
-
-    __zconvey_get_name_of_id "$ZCONVEY_ID"
-    if [ -z "$REPLY" ]; then
-        text="ID: <$ZCONVEY_ID> NAME: (no name assigned)"
-    else
-        text="ID: <$ZCONVEY_ID> NAME: $REPLY"
-    fi
-    tlen="${#text}"
-    hlen=tlen+4
-    headerline="${(r:hlen:: :)headerline}"
-    headerline="${headerline/Zconvey/\033[1;34mZconvey\033[0m\033[1;44m}"
-    headerline2="${(r:hlen:: :)headerline2}"
-    text="${text/(#b)(<[[:digit:]]#>)/\033[1;32m${match[1]}\033[1;33m}"
-    text="${text/(#b)NAME: (?#)/NAME: \033[1;32m${match[1]}\033[0m}"
-
-    [ "$1" != "echo" ] && {
-        echotc sc
-        echotc cm $(( halfl - 3 )) $(( halfc - hlen/2 ))
-        print -n "\033[1;44m$headerline\033[0m"
-        echotc cm $(( halfl - 2 )) $(( halfc - hlen/2 ))
-        print -n "\033[1;44m \033[0m \033[1;33m$text\033[0m \033[1;44m \033[0m"
-        echotc cm $(( halfl - 1 )) $(( halfc - hlen/2 ))
-        print -n "\033[1;44m$headerline2\033[0m"
-        echotc rc
-    } || {
-        print "\033[1;44m$headerline\033[0m\n\033[1;44m \033[0m \033[1;33m$text\033[0m \033[1;44m \033[0m\n\033[1;44m$headerline2\033[0m"
-    }
 }
 
 function zc-logo-all() {
