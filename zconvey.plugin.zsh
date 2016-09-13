@@ -305,19 +305,20 @@ function zc-take() {
 
 function __convey_usage_zc() {
     pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
-    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help]"
+    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask]"
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
     print -- "-n NAME / --name NAME    - NAME of Zsh session"
     print -- "-q/--quiet               - don't output status messages"
     print -- "-v/--verbose             - output more status messages"
+    print -- "-a/--ask                 - ask for command (if not provided) and session (etc.)"
 }
 
 function zc() {
     setopt localoptions extendedglob clobber
 
     local -A opthash
-    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: zs -zshselect || { __convey_usage_zc; return 1; }
+    zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: a -ask || { __convey_usage_zc; return 1; }
 
     integer have_id=0 have_name=0 verbose=0 quiet=0 zshselect=0
     local id name
@@ -336,7 +337,7 @@ function zc() {
     (( ${+opthash[--name]} )) && name="${opthash[--name]}"
 
     # ZSH-SELECT (for acquiring ID)
-    (( zshselect = ${+opthash[-zs]} + ${+opthash[--zshselect]} ))
+    (( ask = ${+opthash[-a]} + ${+opthash[--ask]} ))
 
     # VERBOSE, QUIET
     (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
@@ -352,11 +353,16 @@ function zc() {
         return 1
     fi
 
-    if [[ "$have_id" = 0 && "$have_name" = "0" && "$zshselect" = "0" ]]; then
-        pinfo "Either supply target ID/NAME or request Zsh-Select (-zs/--zshselect)"
+    if [[ "$have_id" = "0" && "$have_name" = "0" && "$ask" = "0" ]]; then
+        pinfo "Either supply target ID/NAME or request Zsh-Select (-a/--ask)"
         return 1
     fi
 
+    local cmd="$*"
+    cmd="${cmd##[[:space:]]#}"
+    cmd="${cmd%%[[:space:]]#}"
+
+    # Resolve name
     if (( $have_name )); then
         __convey_resolve_name_to_id "$name"
         local resolved="$REPLY"
@@ -368,20 +374,43 @@ function zc() {
         # Store the resolved ID and continue normally,
         # with ID as the main specifier of session
         id="$resolved"
-    elif (( $zshselect )); then
-        if ! type zsh-select 2>/dev/null 1>&2; then
-            pinfo "Zsh-Select not installed, please install it first, aborting"
-            return 1
-        else
-            export ZSELECT_START_IN_SEARCH_MODE=0
-            id=`zc-ls | zsh-select`
-            if [ -z "$id" ]; then
-                pinfo "No selection, exiting"
+    fi
+
+    # Resupply missing input if requested
+    if (( $ask )); then
+        # Supply command?
+        if [[ -z "$cmd" ]]; then
+            vared -cp "Enter command to send: " cmd
+            cmd="${cmd##[[:space:]]#}"
+            cmd="${cmd%%[[:space:]]#}"
+            if [ -z "$cmd" ]; then
+                pinfo "No command enterred, exiting"
                 return 0
-            else
-                id="${id//(#b)*ID: ([[:digit:]]#)[^[:digit:]]#*(#e)/$match[1]}"
             fi
         fi
+
+        # Supply session?
+        if [[ "$have_id" = "0" && "$have_name" = "0" ]]; then
+            if ! type zsh-select 2>/dev/null 1>&2; then
+                pinfo "Zsh-Select not installed, please install it before using -a/--ask, aborting"
+                pinfo "Example installation: zplugin load psprint/zsh-select"
+                return 1
+            else
+                export ZSELECT_START_IN_SEARCH_MODE=0
+                id=`zc-ls | zsh-select`
+                if [ -z "$id" ]; then
+                    pinfo "No selection, exiting"
+                    return 0
+                else
+                    id="${id//(#b)*ID: ([[:digit:]]#)[^[:digit:]]#*(#e)/$match[1]}"
+                fi
+            fi
+        fi
+    fi
+
+    if [ -z "$cmd" ]; then
+        pinfo "No command provided, aborting"
+        return 1
     fi
 
     local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
@@ -412,7 +441,7 @@ function zc() {
     fi
 
     # >> - multiple commands can be accumulated
-    print -r -- "$*" >> "$datafile"
+    print -r -- "$cmd" >> "$datafile"
 
     # Release the lock by closing the lock file
     exec {fd}>&-
