@@ -231,7 +231,7 @@ function zc() {
 
     local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
     local lockfile="${datafile}.lock"
-    command touch "$lockfile"
+    echo "PID $$ ID $ZCONVEY_ID is sending command" > "$lockfile"
 
     # 1. Zsh lock with timeout (2 seconds)
     if (( ${ZCONVEY_CONFIG[use_zsystem_flock]} > 0 )); then
@@ -521,7 +521,7 @@ fi
 
 function __convey_on_period_passed() {
     # Reschedule as quickly as possible - user might
-    # press Ctrl-C when function will be working
+    # press Ctrl-C when function is executing
     #
     # Reschedule only if this scheduling sequence
     # comes from approved single origin
@@ -531,7 +531,8 @@ function __convey_on_period_passed() {
     # fail in schedule (because of unlucky Ctrl-C press)
     ZCONVEY_RUN_SECONDS="$SECONDS"
 
-    # ..and block Ctrl-C, this function will not stall
+    # ..and block Ctrl-C, this function will not
+    # stall, no reason for someone to use Ctrl-C
     setopt localtraps; trap '' INT
     setopt localoptions extendedglob clobber
 
@@ -541,7 +542,9 @@ function __convey_on_period_passed() {
     # Quick return when no data
     [ ! -e "$datafile" ] && return 1
 
-    command touch "$lockfile"
+    # Prepare the lock file, follows locking it
+    echo "PID $$ ID $ZCONVEY_ID is reading commands" > "$lockfile"
+
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
     if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
         if ! zsystem flock -t 0 -f fd "$lockfile"; then
