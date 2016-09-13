@@ -552,7 +552,7 @@ function zc-id-logo() {
 
 function zc-id-logo-all() {
     setopt localoptions extendedglob clobber
-    integer idx is_locked
+    integer idx is_locked counter=0
     local busyfile busywith
 
     if [[ "$1" = "-h" || "$1" = "--help" ]]; then
@@ -575,10 +575,13 @@ function zc-id-logo-all() {
                 __convey_get_name_of_id "$idx"
                 print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
             else
+                counter+=1
                 [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" 'zc-id-logo && sleep 20'
             fi
         fi
     done
+
+    pinfo "Sent logo request to $counter sessions, including this one"
 
     return 0
 }
