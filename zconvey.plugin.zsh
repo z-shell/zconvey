@@ -766,14 +766,14 @@ function __convey_on_period_passed() {
     # comes from approved single origin
     [[ "$ZCONVEY_SCHEDULE_ORIGIN" = "$1" ]] && sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
 
-    # Remember when the command was run to detect a possible
-    # fail in schedule (because of unlucky Ctrl-C press)
-    ZCONVEY_RUN_SECONDS="$SECONDS"
-
     # ..and block Ctrl-C, this function will not
     # stall, no reason for someone to use Ctrl-C
     setopt localtraps; trap '' INT
     setopt localoptions extendedglob clobber
+
+    # Remember when the command was run to detect a possible
+    # fail in schedule (because of unlucky Ctrl-C press)
+    ZCONVEY_RUN_SECONDS="$SECONDS"
 
     local fd datafile="${ZCONVEY_IO_DIR}/${ZCONVEY_ID}.io"
     local lockfile="${datafile}.lock"
