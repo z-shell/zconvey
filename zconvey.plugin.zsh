@@ -508,3 +508,5 @@ add-zsh-hook precmd __zconvey_precmd_hook
 
 zle -N zc-logo
 bindkey '^O^I' zc-logo
+
+# vim:ft=zsh
