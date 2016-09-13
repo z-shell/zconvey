@@ -66,12 +66,12 @@ your other `zgen load` calls in.
 
 There are following commands:
 
-- zc – sends to other session; use "-a" option to be asked for target and a command to send
-- zc-rename – assigns name to current or selected session; won't rename if there's a session with the same name
-- zc-take – takes a name for current or selected sessions, schematically renames any conflicting sessions
-- zc-ls – lists all active and named sessions
-- zc-id – shows ID and NAME of current session
-- zc-logo – the same as zc-id, but in a form of on-screen logo; bound to Ctrl-O Ctrl-I
+- `zc` – sends to other session; use "-a" option to be asked for target and a command to send
+- `zc-rename` – assigns name to current or selected session; won't rename if there's a session with the same name
+- `zc-take` – takes a name for current or selected sessions, schematically renames any conflicting sessions
+- `zc-ls` – lists all active and named sessions
+- `zc-id` – shows ID and NAME of current session
+- `zc-logo` – the same as `zc-id`, but in a form of on-screen logo; bound to Ctrl-O Ctrl-I
 
 The main command is `zc`. It is used to execute commands on other sessions. `zc-ls` is the main tool
 to obtain overall information on sessions. `zc-take` is a nice name to quickly name a few sessions.
