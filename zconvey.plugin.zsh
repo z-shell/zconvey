@@ -532,6 +532,32 @@ function zc-id-logo() {
     }
 }
 
+function zc-id-logo-all() {
+    setopt localoptions extendedglob clobber
+    integer idx is_locked
+    local busyfile busywith
+
+    for (( idx = 1; idx <= 100; idx ++ )); do
+        name=""
+        busywith=""
+        is_locked=0
+
+        __convey_is_session_active "$idx" && is_locked=1 || is_locked=0
+
+        if (( is_locked )); then
+            busyfile="$ZCONVEY_OTHER_DIR/${idx}.busy"
+            if [[ -e "$busyfile" && "$idx" != "$ZCONVEY_ID" ]]; then
+                busywith="\033[1;33m$(<$busyfile)\033[0m"
+
+                __convey_get_name_of_id "$idx"
+                print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
+            else
+                zc -qi "$idx" 'zc-id-logo && sleep 20'
+            fi
+        fi
+    done
+}
+
 #
 # Load configuration
 #
