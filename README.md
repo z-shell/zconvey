@@ -71,9 +71,10 @@ There are following commands:
 - `zc-take` – takes a name for current or selected sessions, schematically renames any conflicting sessions
 - `zc-ls` – lists all active and named sessions
 - `zc-id` – shows ID and NAME of current session
-- `zc-logo` – the same as `zc-id`, but in a form of on-screen logo; bound to Ctrl-O Ctrl-I
+- `zc-logo` – the same as `zc-id`, but in a form of an on-screen logo; bound to Ctrl-O Ctrl-I
 
 The main command is `zc`. It is used to execute commands on other sessions. `zc-ls` is the main tool
-to obtain overall information on sessions. `zc-take` is a nice name to quickly name a few sessions.
-Keyboard shortcut Ctrl-O Ctrl-I will show current session's ID and NAME in form of a on-screen logo.
+to obtain overall information on sessions. `zc-take` is a nice rename tool to quickly name a few
+sessions. Keyboard shortcut Ctrl-O Ctrl-I will show current session's ID and NAME in form of an
+on-screen logo.
 
