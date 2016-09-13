@@ -55,8 +55,11 @@ function __zconvey_resolve_name_to_id() {
 
     REPLY=""
     local f
+    local -a arr
     for f in "$ZCONVEY_NAMES_DIR"/*.name(N); do
-        if [[ ${(M)${(f)"$(<$f)"}:#:$name:} ]]; then
+        arr=( ${(@f)"$(<$f)"} )
+        arr=( "${(@M)arr:#:$name:}" )
+        if [ "${#arr}" != "0" ]; then
             REPLY="${${f:t}%.name}"
         fi
     done
