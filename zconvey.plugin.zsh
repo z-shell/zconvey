@@ -363,6 +363,7 @@ function zc() {
 
     local cmd="${args[*]}"
     cmd="${cmd//\\;/;}"
+    cmd="${cmd//\\&/&}"
     cmd="${cmd##[[:space:]]#}"
     cmd="${cmd%%[[:space:]]#}"
 
