@@ -413,6 +413,11 @@ function zc() {
         return 1
     fi
 
+    if [[ "$idx" != <-> || "$idx" = "0" || "$idx" -gt "100" ]]; then
+        pinfo "Incorrect sesion ID occured: $idx. ID should be in range 1..100"
+        return 1
+    fi
+
     local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
     local lockfile="${datafile}.lock"
     echo "PID $$ ID $ZCONVEY_ID is sending command" > "$lockfile"
