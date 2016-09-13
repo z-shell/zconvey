@@ -1,0 +1,124 @@
+==========================================
+=== THE SAME SHELL - THE SAME BEHAVIOR ===
+==========================================
+
+Original flock had behavior:~
+
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+
+Zsh has behavior:~
+
+% zsystem flock -t 1 -f MY2 test.pl; echo $?
+0
+% zsystem flock -t 1 -f MY2 test.pl; echo $?
+0
+
+========================================
+=== NEW SUBSHELL - THE SAME BEHAVIOR ===
+========================================
+
+Original flock had behavior:~
+
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+% zsh
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+101
+
+Zsh has behavior:~
+
+% zsystem flock -t 1 -f MY2 test.pl; echo $?
+0
+% zsh
+% zsystem flock -t 1 -f MY2 test.pl; echo $?
+2
+
+=====================================
+=== EXEC ZSH - DIFFERENT BEHAVIOR ===
+=====================================
+
+Original flock had behavior:
+
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+% exec zsh
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+101
+
+Zsh has behavior (-e doesn't help):~
+
+% zsystem flock -t 1 -f MY2 test.pl; echo $?
+0
+% exec zsh
+% zsystem flock -t 1 -f MY2 test.pl; echo $?
+0
+
+====================
+=== THE SOLUTION ===
+====================
+
+Use -e option for zsystem. It will preserve the descriptor. It should be thus
+exported (ZCONVEY_FD). Even though the descriptor is preserved like in flock
+case, locking it again succeedes. It is the same situation: descriptors are
+preserved, but flock doesn't want to lock it again. Proof that using flock
+preserves the descriptor:
+
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+% echo $MY
+11
+% exec zsh
+% MY=11
+% exec {MY}<&-
+% exec {MY}<&-
+zsh: failed to close file descriptor 11: bad file descriptor
+
+So, the descriptor is provided and locked. Locking file after close or unlock~
+will work:~
+
+% exec {MY}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+% echo $MY
+11
+% exec zsh
+% MY=11
+% exec {MY}<&-
+% exec {MY}<&-
+zsh: failed to close file descriptor 11: bad file descriptor
+% exec {MY3}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY3}" ; echo $?
+0
+
+With flock -u:~
+
+% exec {MY}<test.txt
+%  ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
+0
+% echo $MY
+11
+% exec zsh
+% MY=11
+% ~/github/zconvey.git/myflock/flock -u "${MY}"
+% exec {MY3}<test.txt
+% ~/github/zconvey.git/myflock/flock -nx "${MY3}" ; echo $?
+0
+
+>
+ So, with -e we have a situation: both locks (flock or zsystem lock) are
+ still active after exec or subshell start. It's only that zsystem will
+ relock again on the same descriptor/file when after exec, while flock
+ will not. So, both for exec situation and start-subshell situation we
+ can reuse the exported ZCONVEY_ID and ZCONVEY_FD, and avoid doing what
+ is not consistent between flock and zsystem, i.e. don't do locking.
+
+# vim:ft=help
