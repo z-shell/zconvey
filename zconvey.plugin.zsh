@@ -358,7 +358,11 @@ function zc() {
         return 1
     fi
 
-    local cmd="$*"
+    local -a args
+    args=( "${(q)@}" )
+
+    local cmd="${args[*]}"
+    cmd="${cmd//\\;/;}"
     cmd="${cmd##[[:space:]]#}"
     cmd="${cmd%%[[:space:]]#}"
 
