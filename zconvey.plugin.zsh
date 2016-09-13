@@ -278,7 +278,7 @@ function zc-take() {
         local subst_name
         while (( 1 )); do
             counter+=1
-            subst_name="${new_name%%[[:digit:]]#}${counter}"
+            subst_name="${new_name%%_[[:digit:]]#}_${counter}"
             __convey_resolve_name_to_id "$subst_name"
             if [ -z "$REPLY" ]; then
                 # Found a name that doesn't exist in system, assign
