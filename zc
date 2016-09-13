@@ -1,0 +1,181 @@
+setopt localoptions extendedglob clobber
+
+function __zconvey_usage_zc() {
+    pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
+    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask] COMMAND ARGUMENT ..."
+    print -- "-h/--help                - this message"
+    print -- "-i ID / --id ID          - ID (number) of Zsh session"
+    print -- "-n NAME / --name NAME    - NAME of Zsh session"
+    print -- "-q/--quiet               - don't output status messages"
+    print -- "-v/--verbose             - output more status messages"
+    print -- "-a/--ask                 - ask for command (if not provided) and session (etc.)"
+}
+
+local -A opthash
+zparseopts -D -A opthash h -help q -quiet v -verbose i: -id: n: -name: a -ask || { __zconvey_usage_zc; return 1; }
+
+integer have_id=0 have_name=0 verbose=0 quiet=0 zshselect=0 ask=0
+local id name
+
+# Help
+(( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zconvey_usage_zc; return 0; }
+
+# ID
+have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
+(( ${+opthash[-i]} )) && id="${opthash[-i]}"
+(( ${+opthash[--id]} )) && id="${opthash[--id]}"
+
+# NAME
+have_name=$(( ${+opthash[-n]} + ${+opthash[--name]} ))
+(( ${+opthash[-n]} )) && name="${opthash[-n]}"
+(( ${+opthash[--name]} )) && name="${opthash[--name]}"
+
+# ASK (requests command and/or ID)
+(( ask = ${+opthash[-a]} + ${+opthash[--ask]} ))
+if [ "$ask" = "0" ]; then
+    local ask_setting
+    zstyle -b ":plugin:zconvey" ask ask_setting || ask_setting="no"
+    [ "$ask_setting" = "yes" ] && ask=1 || ask=0
+fi
+
+# VERBOSE, QUIET
+(( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
+(( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
+
+if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
+    pinfo "Please supply only one of ID (-i) and NAME (-n)"
+    return 1
+fi
+
+if [[ "$have_id" != "0" && "$id" != <-> ]]; then
+    pinfo "ID must be numeric, 1..100"
+    return 1
+fi
+
+local -a args
+args=( "${(q)@}" )
+
+local cmd="${args[*]}"
+cmd="${cmd//\\;/;}"
+cmd="${cmd//\\&/&}"
+cmd="${cmd##[[:space:]]#}"
+cmd="${cmd%%[[:space:]]#}"
+
+if [[ -z "$cmd" && "$ask" = "0" ]]; then
+    __zconvey_usage_zc
+    return 1
+fi
+
+if [[ "$have_id" = "0" && "$have_name" = "0" && "$ask" = "0" ]]; then
+    pinfo "Either supply target ID/NAME or request Zsh-Select (-a/--ask)"
+    return 1
+fi
+
+# Resolve name
+if (( $have_name )); then
+    __zconvey_resolve_name_to_id "$name"
+    local resolved="$REPLY"
+    if [ -z "$resolved" ]; then
+        echo "Could not find session named: \`$name'"
+        return 1
+    fi
+
+    # Store the resolved ID and continue normally,
+    # with ID as the main specifier of session
+    id="$resolved"
+fi
+
+# Resupply missing input if requested
+if (( $ask )); then
+    # Supply command?
+    if [[ -z "$cmd" ]]; then
+        vared -cp "Enter command to send: " cmd
+        cmd="${cmd##[[:space:]]#}"
+        cmd="${cmd%%[[:space:]]#}"
+        if [ -z "$cmd" ]; then
+            pinfo "No command enterred, exiting"
+            return 0
+        fi
+    fi
+
+    # Supply session?
+    if [[ "$have_id" = "0" && "$have_name" = "0" ]]; then
+        if ! type zsh-select 2>/dev/null 1>&2; then
+            pinfo "Zsh-Select not installed, please install it before using -a/--ask, aborting"
+            pinfo "Example installation: zplugin load psprint/zsh-select"
+            return 1
+        else
+            export ZSELECT_START_IN_SEARCH_MODE=0
+            id=`zc-ls | zsh-select`
+            if [ -z "$id" ]; then
+                pinfo "No selection, exiting"
+                return 0
+            else
+                id="${id//(#b)*ID: ([[:digit:]]#)[^[:digit:]]#*(#e)/$match[1]}"
+            fi
+        fi
+    fi
+fi
+
+if [ -z "$cmd" ]; then
+    pinfo "No command provided, aborting"
+    return 1
+fi
+
+if [[ "$id" != <-> || "$id" = "0" || "$id" -gt "100" ]]; then
+    pinfo "Incorrect sesion ID occured: \`$idx'. ID should be in range 1..100"
+    return 1
+fi
+
+# Obtain current time stamp
+local ts
+if [ "$ZCONVEY_CONFIG[timestamp_from]" = "datetime" ]; then
+    [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
+    [ "${+modules}" = 0 ] && zmodload zsh/datetime
+    ts="$EPOCHSECONDS"
+fi
+# Also a fallback
+if [[ "$ZCONVEY_CONFIG[timestamp_from]" = "date" || -z "$ts" || "$ts" = "0" ]]; then
+    ts="$( date +%s )"
+fi
+
+local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
+local lockfile="${datafile}.lock"
+echo "PID $$ ID $ZCONVEY_ID is sending command" > "$lockfile"
+
+# 1. Zsh lock with timeout (2 seconds)
+if (( ${ZCONVEY_CONFIG[use_zsystem_flock]} > 0 )); then
+    (( ${verbose} )) && print "Will use zsystem flock..."
+    if ! zsystem flock -t 2 -f fd "$lockfile"; then
+        pinfo2 "Communication channel of session $id is busy, could not send"
+        return 1
+    fi
+    # 2. Provided flock binary (two calls)
+else
+    (( ${verbose} )) && print "Will use provided flock..."
+    exec {fd}>"$lockfile"
+    "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+    if [ "$?" = "101" ]; then
+        (( ${verbose} )) && print "First attempt failed, will retry..."
+        LANG=C sleep 1
+        "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
+        if [ "$?" = "101" ]; then
+            pinfo2 "Communication channel of session $id is busy, could not send"
+            return 1
+        fi
+    fi
+fi
+
+# >> - multiple commands can be accumulated
+print -r -- "$ts $cmd" >> "$datafile"
+
+# Release the lock by closing the lock file
+exec {fd}>&-
+
+if (( ${quiet} == 0 )); then
+    pinfo2 "Zconvey successfully sent command to session $id"
+    local busyfile="$ZCONVEY_OTHER_DIR/${id}.busy"
+    [ -e "$busyfile" ] && print "The session is busy \033[1;33m($(<$busyfile))\033[0m"
+fi
+
+# vim:ft=zsh
