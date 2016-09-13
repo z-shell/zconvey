@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #ifdef __CYGWIN__
   #define TIOCSTI 0x5412
