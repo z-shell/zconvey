@@ -428,6 +428,21 @@ function zc() {
         return 1
     fi
 
+    # Obtain current time stamp
+    local ts timestamp_from
+    zstyle -s ":plugin:zconvey" timestamp_from timestamp_from || timestamp_from="datetime"
+    [[ "$timestamp_from" != "date" && "$timestamp_from" != "datetime" ]] && timestamp_from="datetime"
+
+    if [ "$timestamp_from" = "datetime" ]; then
+        [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
+        [ "${+modules}" = 0 ] && zmodload zsh/datetime
+        ts="$EPOCHSECONDS"
+    fi
+    # Also a fallback
+    if [[ "$timestamp_from" = "date" || -z "$ts" || "$ts" = "0" ]]; then
+        ts="$( date +%s )"
+    fi
+
     local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
     local lockfile="${datafile}.lock"
     echo "PID $$ ID $ZCONVEY_ID is sending command" > "$lockfile"
@@ -456,7 +471,7 @@ function zc() {
     fi
 
     # >> - multiple commands can be accumulated
-    print -r -- "$cmd" >> "$datafile"
+    print -r -- "$ts $cmd" >> "$datafile"
 
     # Release the lock by closing the lock file
     exec {fd}>&-
@@ -809,10 +824,16 @@ function __convey_on_period_passed() {
     command rm -f "$datafile"
     exec {fd}>&-
 
-    local concat_command="${(j:; :)commands[@]}"
-    if [[ -o interactive_comments ]]; then
-        concat_command+=" ##"
-    fi
+    # Get timestamp of each command, concatenate
+    # remaining parts with "; " as separator
+    local line cmdts concat_command=""
+    for line in "${commands[@]}"; do
+        cmdts="${line%% *}"
+        concat_command+="; ${line#* }"
+    done
+    concat_command="${concat_command#; }"
+    [[ -o interactive_comments ]] && concat_command+=" ##"
+
     "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
 
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
