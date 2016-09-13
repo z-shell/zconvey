@@ -22,7 +22,7 @@ fi
 #
 # Autoloads
 #
-autoload zc
+autoload zc zc-rename
 
 #
 # Global variables
@@ -114,94 +114,6 @@ function __zconvey_is_session_active() {
 #
 # User functions
 #
-
-function __zconvey_usage_zc-rename() {
-    pinfo2 "Renames current Zsh session, or one given via ID or (old) NAME"
-    pinfo "Usage: zc-rename [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
-    print -- "-h/--help                - this message"
-    print -- "-i ID / --id ID          - ID (number) of Zsh session"
-    print -- "-n NAME / --name NAME    - NAME of Zsh session"
-    print -- "-q/--quiet               - don't output status messages"
-}
-
-function zc-rename() {
-    setopt localoptions extendedglob clobber
-
-    local -A opthash
-    zparseopts -E -D -A opthash h -help q -quiet i: -id: n: -name: || { __zconvey_usage_zc-rename; return 1; }
-
-    integer have_id=0 have_name=0 quiet=0
-    local id name new_name="$1"
-
-    # Help
-    (( ${+opthash[-h]} + ${+opthash[--help]} )) && { __zconvey_usage_zc-rename; return 0; }
-    [ -z "$new_name" ] && { echo "No new name given"; __zconvey_usage_zc-rename; return 1; }
-
-    # ID
-    have_id=$(( ${+opthash[-i]} + ${+opthash[--id]} ))
-    (( ${+opthash[-i]} )) && id="${opthash[-i]}"
-    (( ${+opthash[--id]} )) && id="${opthash[--id]}"
-
-    # NAME
-    have_name=$(( ${+opthash[-n]} + ${+opthash[--name]} ))
-    (( ${+opthash[-n]} )) && name="${opthash[-n]}"
-    (( ${+opthash[--name]} )) && name="${opthash[--name]}"
-
-    # QUIET
-    (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
-
-    if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
-        pinfo "Please supply only one of ID (-i) and NAME (-n)"
-        return 1
-    fi
-
-    if [[ "$have_id" != "0" && ( "$id" != <-> || "$id" = "0" ) ]]; then
-        pinfo "ID must be numeric, 1..100"
-        return 1
-    fi
-
-    # Rename via NAME?
-    if (( $have_name )); then
-        __zconvey_resolve_name_to_id "$name"
-        local resolved="$REPLY"
-        if [ -z "$resolved" ]; then
-            pinfo "Could not find session named: \`$name'"
-            return 1
-        fi
-
-        # Store the resolved ID and continue normally,
-        # with ID as the main specifier of session
-        id="$resolved"
-    elif (( $have_id == 0 )); then
-        id="$ZCONVEY_ID"
-    fi
-
-    __zconvey_resolve_name_to_id "$new_name"
-    if [ -n "$REPLY" ]; then
-        pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
-        return 1
-    fi
-
-    if [[ "$id" != <-> || "$id" = "0" ]]; then
-        pinfo "Bad ID ($id), aborting"
-        return 1
-    fi
-
-    if [[ "$id" -gt "100" ]]; then
-        pinfo "Maximum nr of sessions is 100, aborting"
-        return 1
-    fi
-
-    print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
-
-    if (( ${quiet} == 0 )); then
-        pinfo2 "Renamed session $id to: $new_name"
-    fi
-
-    local ls_after_rename
-    zstyle -b ":plugin:zconvey" ls_after_rename ls_after_rename || ls_after_rename="no"
-    [ "$ls_after_rename" = "yes" ] && print && zc-ls
-}
 
 function __zconvey_usage_zc-take() {
     pinfo2 "Takes a name for current Zsh session, i.e. takes it away from any other session if needed"
