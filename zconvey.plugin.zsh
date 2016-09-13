@@ -590,7 +590,11 @@ function __convey_on_period_passed() {
     command rm -f "$datafile"
     exec {fd}>&-
 
-    "${ZCONVEY_REPO_DIR}/feeder/feeder" "${(j:; :)commands[@]} ##"
+    local concat_command="${(j:; :)commands[@]}"
+    if [[ -o interactive_comments ]]; then
+        concat_command+=" ##"
+    fi
+    "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
 
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
     # .kill-line, .vi-kill-line, .kill-buffer, .kill-whole-line
