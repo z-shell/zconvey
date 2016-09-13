@@ -515,7 +515,7 @@ function zc-id() {
 }
 
 # Prints a graphical "logo" with ID and NAME
-function zc-id-logo() {
+function zc-logo() {
     setopt localoptions extendedglob
 
     integer halfl=$(( LINES / 2 )) halfc=$(( COLUMNS / 2 ))
@@ -550,13 +550,13 @@ function zc-id-logo() {
     }
 }
 
-function zc-id-logo-all() {
+function zc-logo-all() {
     setopt localoptions extendedglob clobber
     integer idx is_locked counter=0
     local busyfile busywith
 
     if [[ "$1" = "-h" || "$1" = "--help" ]]; then
-        pinfo "Sends zc-id-logo or zc-id to all terminals (the latter when argument \"text\" is passed)"
+        pinfo "Sends zc-logo or zc-id to all terminals (the latter when argument \"text\" is passed)"
         return 0
     fi
 
@@ -576,7 +576,7 @@ function zc-id-logo-all() {
                 print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
             else
                 counter+=1
-                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" 'zc-id-logo && sleep 20'
+                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" 'zc-logo && sleep 20'
             fi
         fi
     done
@@ -720,7 +720,7 @@ fi
     done
 
     # Show what is resolved (ID and possibly a NAME)
-    [ "$ZCONVEY_CONFIG[greeting]" = "logo" ] && zc-id-logo echo
+    [ "$ZCONVEY_CONFIG[greeting]" = "logo" ] && zc-logo echo
     [ "$ZCONVEY_CONFIG[greeting]" = "text" ] && zc-id
 }
 
@@ -868,5 +868,5 @@ add-zsh-hook zshexit __convey_zshexit
 add-zsh-hook preexec __convey_preexec_hook
 add-zsh-hook precmd __convey_precmd_hook
 
-zle -N zc-id-logo
-bindkey '^O^I' zc-id-logo
+zle -N zc-logo
+bindkey '^O^I' zc-logo
