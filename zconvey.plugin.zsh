@@ -511,6 +511,11 @@ function zc-id-logo-all() {
     integer idx is_locked
     local busyfile busywith
 
+    if [[ "$1" = "-h" || "$1" = "--help" ]]; then
+        pinfo "Sends zc-id-logo or zc-id to all terminals (the latter when argument \"text\" is passed)"
+        return 0
+    fi
+
     for (( idx = 1; idx <= 100; idx ++ )); do
         name=""
         busywith=""
@@ -526,10 +531,12 @@ function zc-id-logo-all() {
                 __convey_get_name_of_id "$idx"
                 print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
             else
-                zc -qi "$idx" 'zc-id-logo && sleep 20'
+                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" 'zc-id-logo && sleep 20'
             fi
         fi
     done
+
+    return 0
 }
 
 #
