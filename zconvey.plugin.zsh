@@ -105,8 +105,7 @@ function zc-rename() {
     (( ${+opthash[-n]} )) && name="${opthash[-n]}"
     (( ${+opthash[--name]} )) && name="${opthash[--name]}"
 
-    # VERBOSE, QUIET
-    (( verbose = ${+opthash[-v]} + ${+opthash[--verbose]} ))
+    # QUIET
     (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 
     if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
