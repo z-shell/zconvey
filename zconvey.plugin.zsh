@@ -833,8 +833,6 @@ __convey_preexec_hook() {
         # scheduling sequence will be quickly eradicated
         ZCONVEY_SCHEDULE_ORIGIN="$SECONDS"
         sched +"${ZCONVEY_CONFIG[check_interval]}" __convey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
-
-        pinfo "Failure in reschedule detected"
     fi
 
     # Mark that the shell is busy
