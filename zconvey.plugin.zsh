@@ -246,6 +246,9 @@ function zc-take() {
                 # Found a name that doesn't exist in system, assign
                 # it to the initial conflicting session $new_name
                 print ":$subst_name:" > "$ZCONVEY_NAMES_DIR"/"$other_id".name
+
+                (( ${quiet} == 0 )) && pinfo "Pre-rename: $new_name -> $subst_name"
+
                 break
             fi
         done
