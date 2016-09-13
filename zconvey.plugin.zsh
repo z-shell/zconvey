@@ -657,6 +657,10 @@ fi
     integer idx try_id res
     local fd lockfile
 
+    # When in Tmux then consider every subshell session
+    # as new (no inheritance). TODO: detect exec zsh
+    [ -n "$TMUX" ] && ZCONVEY_ID=0 && ZCONVEY_FD=0
+
     # Already assigned ID (inherited)?
     idx=0
     if [[ "$ZCONVEY_FD" = <-> && "$ZCONVEY_FD" != "0" && "$ZCONVEY_ID" = <-> && "$ZCONVEY_ID" != "0" ]]; then
