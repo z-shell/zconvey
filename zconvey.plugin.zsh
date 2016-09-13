@@ -256,7 +256,8 @@ function zc() {
         fi
     fi
 
-    print -r -- "$*" > "$datafile"
+    # >> - multiple commands can be accumulated
+    print -r -- "$*" >> "$datafile"
 
     # Release the lock by closing the lock file
     exec {fd}>&-
