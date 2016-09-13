@@ -7,7 +7,7 @@ and can send commands to each other.
 
 ## Zstyles
 
-The values being set are the defaults.
+The values being set are the defaults. They must be set before loading the plugin.
 
 ```zsh
 zstyle ":plugin:zconvey" check_interval "2"         # How often to check if there are new commands (in seconds)
