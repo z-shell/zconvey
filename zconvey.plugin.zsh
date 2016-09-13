@@ -625,6 +625,11 @@ function zc-logo-all() {
     zstyle -s ":plugin:zconvey" timestamp_from timestamp_from || timestamp_from="datetime"
     [[ "$timestamp_from" != "date" && "$timestamp_from" != "datetime" ]] && timestamp_from="datetime"
     ZCONVEY_CONFIG[timestamp_from]="$timestamp_from"
+
+    local expire_seconds
+    zstyle -s ":plugin:zconvey" expire_seconds expire_seconds || expire_seconds="20"
+    [[ "$expire_seconds" != <-> ]] && expire_seconds="20"
+    ZCONVEY_CONFIG[expire_seconds]="$expire_seconds"
 }
 
 #
@@ -826,6 +831,18 @@ function __convey_on_period_passed() {
     command rm -f "$datafile"
     exec {fd}>&-
 
+    # Obtain current time stamp
+    local ts
+    if [ "$ZCONVEY_CONFIG[timestamp_from]" = "datetime" ]; then
+        [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
+        [ "${+modules}" = 0 ] && zmodload zsh/datetime
+        ts="$EPOCHSECONDS"
+    fi
+    # Also a fallback
+    if [[ "$ZCONVEY_CONFIG[timestamp_from]" = "date" || -z "$ts" || "$ts" = "0" ]]; then
+        ts="$( date +%s )"
+    fi
+
     # Get timestamp of each command, concatenate
     # remaining parts with "; " as separator
     local line cmdts concat_command=""
@@ -836,7 +853,10 @@ function __convey_on_period_passed() {
     concat_command="${concat_command#; }"
     [[ -o interactive_comments ]] && concat_command+=" ##"
 
-    "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
+    # TODO: a message that command expired
+    if (( ts - cmdts <= ZCONVEY_CONFIG[expire_seconds] )); then
+        "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
+    fi
 
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
     # .kill-line, .vi-kill-line, .kill-buffer, .kill-whole-line
