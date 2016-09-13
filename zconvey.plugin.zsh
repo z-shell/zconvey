@@ -155,6 +155,10 @@ function zc-rename() {
     if (( ${quiet} == 0 )); then
         pinfo2 "Renamed session $id to: $new_name"
     fi
+
+    local ls_after_rename
+    zstyle -b ":plugin:zconvey" ls_after_rename ls_after_rename || ls_after_rename="no"
+    [ "$ls_after_rename" = "yes" ] && print && zc-ls
 }
 
 function __convey_usage_zc-take() {
@@ -259,6 +263,10 @@ function zc-take() {
     if (( ${quiet} == 0 )); then
         pinfo2 "Renamed session $id to: $new_name"
     fi
+
+    local ls_after_rename
+    zstyle -b ":plugin:zconvey" ls_after_rename ls_after_rename || ls_after_rename="no"
+    [ "$ls_after_rename" = "yes" ] && print && zc-ls
 }
 
 function __convey_usage_zc() {
