@@ -3,7 +3,9 @@
 Zconvey integrates multiple Zsh sessions. They are given an ID, optionally a NAME (both unique),
 and can send commands to each other.
 
-[![asciicast](https://asciinema.org/a/ayklrum7g4ut2hpt7mg6j0nzj.png)](https://asciinema.org/a/ayklrum7g4ut2hpt7mg6j0nzj)
+Video – view on [asciinema](https://asciinema.org/a/85646). You can resize the video by pressing `Ctrl-+` or `Cmd-+`.
+
+[![asciicast](https://asciinema.org/a/85646.png)](https://asciinema.org/a/85646)
 
 ## Zstyles
 
