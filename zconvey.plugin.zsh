@@ -429,17 +429,14 @@ function zc() {
     fi
 
     # Obtain current time stamp
-    local ts timestamp_from
-    zstyle -s ":plugin:zconvey" timestamp_from timestamp_from || timestamp_from="datetime"
-    [[ "$timestamp_from" != "date" && "$timestamp_from" != "datetime" ]] && timestamp_from="datetime"
-
-    if [ "$timestamp_from" = "datetime" ]; then
+    local ts
+    if [ "$ZCONVEY_CONFIG[timestamp_from]" = "datetime" ]; then
         [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
         [ "${+modules}" = 0 ] && zmodload zsh/datetime
         ts="$EPOCHSECONDS"
     fi
     # Also a fallback
-    if [[ "$timestamp_from" = "date" || -z "$ts" || "$ts" = "0" ]]; then
+    if [[ "$ZCONVEY_CONFIG[timestamp_from]" = "date" || -z "$ts" || "$ts" = "0" ]]; then
         ts="$( date +%s )"
     fi
 
@@ -623,6 +620,11 @@ function zc-logo-all() {
     zstyle -s ":plugin:zconvey" greeting greeting || greeting="logo"
     [[ "$greeting" != "none" && "$greeting" != "text" && "$greeting" != "logo" ]] && greeting="logo"
     ZCONVEY_CONFIG[greeting]="$greeting"
+
+    local timestamp_from
+    zstyle -s ":plugin:zconvey" timestamp_from timestamp_from || timestamp_from="datetime"
+    [[ "$timestamp_from" != "date" && "$timestamp_from" != "datetime" ]] && timestamp_from="datetime"
+    ZCONVEY_CONFIG[timestamp_from]="$timestamp_from"
 }
 
 #
