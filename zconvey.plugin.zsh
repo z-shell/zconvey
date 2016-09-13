@@ -662,6 +662,8 @@ fi
     if [[ "$ZCONVEY_FD" = <-> && "$ZCONVEY_FD" != "0" && "$ZCONVEY_ID" = <-> && "$ZCONVEY_ID" != "0" ]]; then
         # Inherited FD and ID, no need to perform work
         if print -u "$ZCONVEY_FD" -n 2>/dev/null; then
+            # Unbusy this session
+            command rm -f "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
             idx=101
         fi
     fi
