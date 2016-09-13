@@ -632,6 +632,11 @@ function zc-logo-all() {
     zstyle -s ":plugin:zconvey" expire_seconds expire_seconds || expire_seconds="20"
     [[ "$expire_seconds" != <-> ]] && expire_seconds="20"
     ZCONVEY_CONFIG[expire_seconds]="$expire_seconds"
+
+    local output_method
+    zstyle -s ":plugin:zconvey" output_method output_method || output_method="feeder"
+    [[ "$output_method" != "feeder" && "$output_method" != "zsh" ]] && output_method="feeder"
+    ZCONVEY_CONFIG[output_method]="$output_method"
 }
 
 #
@@ -755,6 +760,19 @@ fi
 }
 
 #
+# Function to paste to command line, used when zle is active
+#
+
+function __convey_zle_paster() {
+    zle .kill-buffer
+    LBUFFER+="$*"
+    zle .redisplay
+    zle .accept-line
+}
+
+zle -N __convey_zle_paster
+
+#
 # Function to check for input commands
 #
 
@@ -857,7 +875,16 @@ function __convey_on_period_passed() {
 
     # TODO: a message that command expired
     if (( ts - cmdts <= ZCONVEY_CONFIG[expire_seconds] )); then
-        "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
+        # Two available methods of outputting the command
+        if [ "${ZCONVEY_CONFIG[output_method]}" = "zsh" ]; then
+            if zle; then
+                zle __convey_zle_paster "$concat_command"
+            else
+                print -zr "$concat_command"
+            fi
+        else
+            "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
+        fi
     fi
 
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,

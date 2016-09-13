@@ -17,5 +17,8 @@ zstyle ":plugin:zconvey" ask "0"                    # zc won't ask for missing d
 zstyle ":plugin:zconvey" ls_after_rename "0"        # Don't execute zc-ls after doing rename (with zc-rename or zc-take)
 zstyle ":plugin:zconvey" use_zsystem_flock "1"      # Should use faster zsystem's flock when it's possible?
                                                     # (default true on Zsh >= 5.3)
+zstyle ":plugin:zconvey" output_method "feeder"     # To put commands on command line, Zconvey can use small program "feeder". Or "zsh"
+                                                    # method, which currently doesn't automatically run the command – to use when e.g.
+                                                    # feeder doesn't build (unlikely) or when occurring any problems with it
 zstyle ":plugin:zconvey" timestamp_from "datetime"  # Use zsh/datetime module for obtaining timestamp. "date" – use date command (fork)
 ```
