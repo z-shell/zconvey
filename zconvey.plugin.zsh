@@ -113,7 +113,7 @@ function zc-rename() {
         return 1
     fi
 
-    if [[ "$have_id" != "0" && "$id" != <-> ]]; then
+    if [[ "$have_id" != "0" && ( "$id" != <-> || "$id" = "0" ) ]]; then
         pinfo "ID must be numeric, 1..100"
         return 1
     fi
@@ -123,13 +123,13 @@ function zc-rename() {
         __convey_resolve_name_to_id "$name"
         local resolved="$REPLY"
         if [ -z "$resolved" ]; then
-            echo "Could not find session named: \`$name'"
+            pinfo "Could not find session named: \`$name'"
             return 1
         fi
 
         __convey_resolve_name_to_id "$new_name"
         if [ -n "$REPLY" ]; then
-            echo "A session already has target name: \`$new_name' (its ID: $REPLY)"
+            pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
             return 1
         fi
 
@@ -138,6 +138,16 @@ function zc-rename() {
         id="$resolved"
     elif (( $have_id == 0 )); then
         id="$ZCONVEY_ID"
+    fi
+
+    if [[ "$id" != <-> || "$id" = "0" ]]; then
+        pinfo "Bad ID ($id), aborting"
+        return 1
+    fi
+
+    if [[ "$id" -gt "100" ]]; then
+        pinfo "Maximum nr of sessions is 100, aborting"
+        return 1
     fi
 
     print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
