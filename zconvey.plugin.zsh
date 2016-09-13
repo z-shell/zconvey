@@ -423,8 +423,8 @@ function zc() {
         return 1
     fi
 
-    if [[ "$idx" != <-> || "$idx" = "0" || "$idx" -gt "100" ]]; then
-        pinfo "Incorrect sesion ID occured: $idx. ID should be in range 1..100"
+    if [[ "$id" != <-> || "$id" = "0" || "$id" -gt "100" ]]; then
+        pinfo "Incorrect sesion ID occured: \`$idx'. ID should be in range 1..100"
         return 1
     fi
 
