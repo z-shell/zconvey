@@ -2,7 +2,7 @@
 === THE SAME SHELL - THE SAME BEHAVIOR ===
 ==========================================
 
-Original flock had behavior:~
+Flock has behavior:~
 
 % exec {MY}<test.txt
 % ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
@@ -21,7 +21,7 @@ Zsh has behavior:~
 === NEW SUBSHELL - THE SAME BEHAVIOR ===
 ========================================
 
-Original flock had behavior:~
+Flock has behavior:~
 
 % exec {MY}<test.txt
 % ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
@@ -43,7 +43,7 @@ Zsh has behavior:~
 === EXEC ZSH - DIFFERENT BEHAVIOR ===
 =====================================
 
-Original flock had behavior:
+Flock has behavior:
 
 % exec {MY}<test.txt
 % ~/github/zconvey.git/myflock/flock -nx "${MY}" ; echo $?
