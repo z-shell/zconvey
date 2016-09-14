@@ -13,7 +13,7 @@ The values being set are the defaults. They must be set before loading the plugi
 
 ```zsh
 zstyle ":plugin:zconvey" check_interval "2"         # How often to check if there are new commands (in seconds)
-zstyle ":plugin:zconvey" expire_seconds "20"        # If shell is busy for 20 seconds, the received command will expire and not run
+zstyle ":plugin:zconvey" expire_seconds "22"        # If shell is busy for 22 seconds, the received command will expire and not run
 zstyle ":plugin:zconvey" greeting "logo"            # Display logo at Zsh start ("text" – display text, "none" – no greeting)
 zstyle ":plugin:zconvey" ask "0"                    # zc won't ask for missing data ("1" has the same effect as always using -a option)
 zstyle ":plugin:zconvey" ls_after_rename "0"        # Don't execute zc-ls after doing rename (with zc-rename or zc-take)

@@ -150,7 +150,7 @@ function zc-logo-all() {
                 print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
             else
                 counter+=1
-                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" zc-logo \&\& sleep 20
+                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" zc-logo \&\& sleep 18
             fi
         fi
     done
@@ -189,8 +189,8 @@ function zc-logo-all() {
     ZCONVEY_CONFIG[timestamp_from]="$timestamp_from"
 
     local expire_seconds
-    zstyle -s ":plugin:zconvey" expire_seconds expire_seconds || expire_seconds="20"
-    [[ "$expire_seconds" != <-> ]] && expire_seconds="20"
+    zstyle -s ":plugin:zconvey" expire_seconds expire_seconds || expire_seconds="22"
+    [[ "$expire_seconds" != <-> ]] && expire_seconds="22"
     ZCONVEY_CONFIG[expire_seconds]="$expire_seconds"
 
     local output_method
