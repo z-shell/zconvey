@@ -105,7 +105,7 @@ if (( $ask )); then
             pinfo "Example installation: zplugin load psprint/zsh-select"
             return 1
         else
-            export ZSELECT_START_IN_SEARCH_MODE=0
+            export ZSHSELECT_START_IN_SEARCH_MODE=0
             id=`zc-ls | zsh-select`
             if [ -z "$id" ]; then
                 pinfo "No selection, exiting"
