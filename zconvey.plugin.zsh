@@ -22,7 +22,7 @@ fi
 #
 # Autoloads
 #
-autoload zc zc-rename zc-take zc-ls zc-logo
+autoload zc zc-rename zc-take zc-ls zc-logo zc-logo-all
 
 #
 # Global variables
@@ -122,42 +122,6 @@ function zc-id() {
     else
         print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m, name: \033[1;33m${REPLY}\033[0m";
     fi
-}
-
-function zc-logo-all() {
-    setopt localoptions extendedglob clobber
-    integer idx is_locked counter=0
-    local busyfile busywith
-
-    if [[ "$1" = "-h" || "$1" = "--help" ]]; then
-        pinfo "Sends zc-logo or zc-id to all terminals (the latter when argument \"text\" is passed)"
-        return 0
-    fi
-
-    for (( idx = 1; idx <= 100; idx ++ )); do
-        name=""
-        busywith=""
-        is_locked=0
-
-        __zconvey_is_session_active "$idx" && is_locked=1 || is_locked=0
-
-        if (( is_locked )); then
-            busyfile="$ZCONVEY_OTHER_DIR/${idx}.busy"
-            if [[ -e "$busyfile" && "$idx" != "$ZCONVEY_ID" ]]; then
-                busywith="\033[1;33m$(<$busyfile)\033[0m"
-
-                __zconvey_get_name_of_id "$idx"
-                print "Session $idx (name: $REPLY) busy ($busywith), no logo request for it"
-            else
-                counter+=1
-                [ "$1" = "text" ] && zc -qi "$idx" zc-id || zc -qi "$idx" zc-logo \&\& sleep 18
-            fi
-        fi
-    done
-
-    pinfo "Sent logo request to $counter sessions, including this one"
-
-    return 0
 }
 
 #
