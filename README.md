@@ -40,6 +40,8 @@ If using a plugin manager, then `Zplugin` is recommended, but you can use any
 other too, and also install with `Oh My Zsh` (by copying directory to
 `~/.oh-my-zsh/custom/plugins`).
 
+The plugin integrates with my other plugin [Zsh-Select](https://github.com/psprint/zsh-select).
+Install it with e.g. Zplugin to be able to use `-a` option for `zc` command.
 
 ### [Zplugin](https://github.com/psprint/zplugin)
 
