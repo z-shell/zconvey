@@ -44,7 +44,8 @@ other too, and also install with `Oh My Zsh` (by copying directory to
 ### [Zplugin](https://github.com/psprint/zplugin)
 
 Add `zplugin load psprint/zconvey` to your `.zshrc` file. Zplugin will handle
-cloning the plugin for you automatically the next time you start zsh.
+cloning the plugin for you automatically the next time you start zsh. To update
+issue `zplugin update psprint/zconvey` (`update-all` can also be used).
 
 ### Antigen
 
