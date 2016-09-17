@@ -337,7 +337,7 @@ function __zconvey_on_period_passed() {
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
-                    return 1
+                    return 2
                 fi
             fi
         fi
@@ -347,7 +347,7 @@ function __zconvey_on_period_passed() {
             # Waited too long, lock must be broken, remove it
             command rm -f "$lockfile"
             # Will handle this input at next call
-            return 1
+            return 3
         fi
     # 3. Provided flock binary
     else
@@ -364,7 +364,7 @@ function __zconvey_on_period_passed() {
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
-                    return 1
+                    return 4
                 fi
             fi
         fi
