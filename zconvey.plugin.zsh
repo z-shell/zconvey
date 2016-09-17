@@ -170,7 +170,7 @@ function zc-id() {
 # Binary flock command that supports 0 second timeout (zsystem's
 # flock in Zsh ver. < 5.3 doesn't) - util-linux/flock stripped
 # of some things, compiles hopefully everywhere (tested on OS X,
-# Linux).
+# Linux, FreeBSD).
 if [ ! -e "${ZCONVEY_REPO_DIR}/myflock/flock" ]; then
     echo "\033[1;35m""psprint\033[0m/\033[1;33m""zconvey\033[0m is building small locking command for you..."
     make -C "${ZCONVEY_REPO_DIR}/myflock"
