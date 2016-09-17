@@ -321,7 +321,7 @@ function __zconvey_on_period_passed() {
     local lockfile="${datafile}.lock"
 
     # Quick return when no data
-    [ ! -e "$datafile" ] && return 1
+    [ ! -e "$datafile" ] && return 0
 
     # Prepare the lock file, follows locking it
     echo "PID $$ ID $ZCONVEY_ID is reading commands" > "$lockfile"
