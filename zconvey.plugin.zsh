@@ -74,7 +74,10 @@ function __zconvey_get_name_of_id() {
         REPLY=${(f)"$(<$f)"}
         REPLY="${REPLY#:}"
         REPLY="${REPLY%:}"
+        return 0
     fi
+
+    return 1
 }
 
 function __zconvey_is_session_active() {
