@@ -71,6 +71,7 @@ your other `zgen load` calls in.
 There are following commands:
 
 - `zc` – sends to other session; use "-a" option to be asked for target and a command to send
+- `zc-all` – the same as `zc`, but targets are all other active sessions (with `-f` also busy sessions)
 - `zc-rename` – assigns name to current or selected session; won't rename if there's a session with the same name
 - `zc-take` – takes a name for current or selected sessions, schematically renames any conflicting sessions
 - `zc-ls` – lists all active and named sessions
