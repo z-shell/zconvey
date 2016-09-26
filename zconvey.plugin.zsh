@@ -22,7 +22,7 @@ fi
 #
 # Autoloads
 #
-autoload zc zc-rename zc-take zc-ls zc-logo zc-logo-all
+autoload zc zc-rename zc-take zc-ls zc-logo zc-logo-all zc-all
 
 #
 # Global variables
