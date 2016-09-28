@@ -9,6 +9,7 @@ __zconvey_usage_zc-all() {
     print -- "-q/--quiet               - don't output status messages"
     print -- "-v/--verbose             - output more status messages"
     print -- "-a/--ask                 - ask for command (if not provided)"
+    print -- "-f/--force               - send also to busy sessions; command can time out"
 }
 
 local -A opthash
