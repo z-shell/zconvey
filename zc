@@ -183,9 +183,9 @@ exec {fd}>&-
 if (( ${quiet} == 0 )); then
     __zconvey_get_name_of_id "$id"
     if [[ -n "$REPLY" ]]; then
-        pinfo2 "Zconvey successfully sent command to session $id (name: $REPLY)"
+        print "Zconvey successfully sent command to \033[1;32msession $id\033[0m (name: \033[1;32m$REPLY\033[0m)"
     else
-        pinfo2 "Zconvey successfully sent command to session $id"
+        print "Zconvey successfully sent command to \033[1;32msession $id\033[0m"
     fi
     local busyfile="$ZCONVEY_OTHER_DIR/${id}.busy"
     [ -e "$busyfile" ] && print "The session is busy \033[1;33m($(<$busyfile))\033[0m (command will time out after ${ZCONVEY_CONFIG[expire_seconds]}s)"
