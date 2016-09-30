@@ -77,7 +77,7 @@ for (( idx = 1; idx <= 100; idx ++ )); do
             __zconvey_get_name_of_id "$idx"
             if (( force )); then
                 counter+=1
-                (( quiet )) || print "Sending to busy session $idx (name: $REPLY, busy with: $busywith)"
+                (( quiet )) || print "\033[1;35mSending to busy\033[0m session $idx (name: $REPLY, busy with: $busywith)"
                 zc -qi "$idx" -r "${cmd[@]}"
             else
                 (( quiet )) || print "Session $idx (name: $REPLY) busy ($busywith)"
