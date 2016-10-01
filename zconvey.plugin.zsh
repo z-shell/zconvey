@@ -281,6 +281,9 @@ fi
         fi
     done
 
+    # Output PID to the locked file
+    [[ "$ZCONVEY_FD" -ne "0" ]] && echo "$$" >&${ZCONVEY_FD}
+
     # Show what is resolved (ID and possibly a NAME)
     [ "$ZCONVEY_CONFIG[greeting]" = "logo" ] && zc-logo echo
     [ "$ZCONVEY_CONFIG[greeting]" = "text" ] && zc-id
