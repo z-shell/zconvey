@@ -95,20 +95,23 @@ function __zconvey_is_session_active() {
         if [ -e "$idfile" ]; then
             # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
             if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-                zsystem flock -t 0 -f tmpfd "$idfile"
+                zsystem 2>/dev/null flock -t 0 -f tmpfd "$idfile"
                 res="$?"
             else
                 exec {tmpfd}>"$idfile"
                 "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$tmpfd"
                 res="$?"
+
+                # Close the fd immediately - unlocking if gained lock
+                exec {tmpfd}>&-
             fi
 
             if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
                 is_locked=1
+            elif [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]]; then
+                # Close the lock immediately
+                zsystem flock -u "$tmpfd"
             fi
-
-            # Close the lock immediately
-            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ] && zsystem flock -u "$tmpfd" || exec {tmpfd}>&-
         fi
 
         return $(( 1-is_locked ))
