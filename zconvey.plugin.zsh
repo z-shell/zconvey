@@ -238,12 +238,12 @@ fi
         [[ "$try_id" = "0" ]] && continue
 
         lockfile="${ZCONVEY_LOCKS_DIR}/zsh_nr${try_id}"
-        echo "Lock done by Zsh (PID $$)" > "$lockfile"
+        [[ ! -f "$lockfile" ]] && echo "(created)" > "$lockfile"
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
         # -e: preserve file descriptor on exec
         if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
-            zsystem flock -t 0 -f ZCONVEY_FD -e "$lockfile"
+            zsystem 2>/dev/null flock -t 0 -f ZCONVEY_FD -e "$lockfile"
             res="$?"
         else
             exec {ZCONVEY_FD}>"$lockfile"
@@ -284,8 +284,10 @@ fi
         fi
     done
 
-    # Output PID to the locked file
-    [[ "$ZCONVEY_FD" -ne "0" ]] && echo "$$" >&${ZCONVEY_FD}
+    # Output PID to the locked file. The problem is
+    # with Zsh 5.3, 5.3.1 - zsystem's obtained file
+    # descriptors cannot be written to
+    [[ "$ZCONVEY_FD" -ne "0" ]] && { echo "$$" >&${ZCONVEY_FD} } 2>/dev/null
 
     # Show what is resolved (ID and possibly a NAME)
     [ "$ZCONVEY_CONFIG[greeting]" = "logo" ] && zc-logo echo
