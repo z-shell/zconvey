@@ -89,10 +89,15 @@ function __zconvey_is_session_active() {
             return 2
         fi
 
+        if [[ "$idx" = "$ZCONVEY_ID" ]]; then
+            # Return true - current session is active
+            return 0;
+        fi
+
         integer is_locked=0
         local idfile="$ZCONVEY_LOCKS_DIR/zsh_nr${idx}" tmpfd
 
-        if [ -e "$idfile" ]; then
+        if [[ -e "$idfile" ]]; then
             # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
             if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
                 zsystem 2>/dev/null flock -t 0 -f tmpfd "$idfile"
