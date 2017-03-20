@@ -182,15 +182,31 @@ function zc-id() {
 # flock in Zsh ver. < 5.3 doesn't) - util-linux/flock stripped
 # of some things, compiles hopefully everywhere (tested on OS X,
 # Linux, FreeBSD).
-if [ ! -e "${ZCONVEY_REPO_DIR}/myflock/flock" ]; then
-    echo "\033[1;35m""psprint\033[0m/\033[1;33m""zconvey\033[0m is building small locking command for you..."
-    make -C "${ZCONVEY_REPO_DIR}/myflock"
+if [[ ! -e "${ZCONVEY_REPO_DIR}/myflock/flock" ]]; then
+    (
+        if zmodload zsh/system; then
+            if zsystem flock -t 1 "${ZCONVEY_REPO_DIR}/myflock/flock.c"; then
+                echo "\033[1;35m""zdharma\033[0m/\033[1;33m""zconvey\033[0m is building small locking command for you..."
+                make -C "${ZCONVEY_REPO_DIR}/myflock"
+            fi
+        else
+            make -C "${ZCONVEY_REPO_DIR}/myflock"
+        fi
+    )
 fi
 
 # A command that feeds data to command line, via TIOCSTI ioctl
-if [ ! -e "${ZCONVEY_REPO_DIR}/feeder/feeder" ]; then
-    echo "\033[1;35m""psprint\033[0m/\033[1;33m""zconvey\033[0m is building small command line feeder for you..."
-    make -C "${ZCONVEY_REPO_DIR}/feeder"
+if [[ ! -e "${ZCONVEY_REPO_DIR}/feeder/feeder" ]]; then
+    (
+        if zmodload zsh/system; then
+            if zsystem flock -t 1 "${ZCONVEY_REPO_DIR}/myflock/flock.c"; then
+                echo "\033[1;35m""zdharma\033[0m/\033[1;33m""zconvey\033[0m is building small command line feeder for you..."
+                make -C "${ZCONVEY_REPO_DIR}/feeder"
+            fi
+        else
+            make -C "${ZCONVEY_REPO_DIR}/feeder"
+        fi
+    )
 fi
 
 #
