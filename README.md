@@ -1,8 +1,8 @@
 ## Introduction
 
 Zconvey integrates multiple Zsh sessions. They are given an ID, optionally a NAME (both unique),
-and can send commands to each other. This I see as a step towards IDEs – there are multiple windows
-that are tied together and have a role assigned.
+and can send commands to each other. Use this to switch all your Zshells to given directory, via
+`zc-all -f cd $PWD`!
 
 Video – view on [asciinema](https://asciinema.org/a/85646). You can resize the video by pressing `Ctrl-+` or `Cmd-+`.
 
