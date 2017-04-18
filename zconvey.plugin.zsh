@@ -154,7 +154,7 @@ function zc-id() {
     ZCONVEY_CONFIG[use_zsystem_flock]="$use_zsystem_flock"
 
     local greeting
-    zstyle -s ":plugin:zconvey" greeting greeting || greeting="logo"
+    zstyle -s ":plugin:zconvey" greeting greeting || greeting="text"
     [[ "$greeting" != "none" && "$greeting" != "text" && "$greeting" != "logo" ]] && greeting="logo"
     ZCONVEY_CONFIG[greeting]="$greeting"
 
