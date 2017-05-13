@@ -1,6 +1,6 @@
 setopt localoptions extendedglob clobber
 integer idx is_locked counter=0
-local busyfile busywith
+local name busyfile busywith
 
 __zconvey_usage_zc-all() {
     pinfo2 "Sends command to all unbusy sessions (also busy when -f passed)"

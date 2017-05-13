@@ -82,7 +82,7 @@ function __zconvey_get_name_of_id() {
 
 function __zconvey_is_session_active() {
         setopt localoptions extendedglob
-        local idx="$1"
+        local res idx="$1"
 
         if [[ "$idx" != <-> || "$idx" = "0" || "$idx" -gt "100" ]]; then
             pinfo "Incorrect sesion ID occured: $idx"
