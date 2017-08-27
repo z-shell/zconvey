@@ -42,11 +42,11 @@ command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$Z
 # Helper functions
 #
 
-function pinfo() {
+function __zconvey_pinfo() {
     print -- "\033[1;32m$*\033[0m";
 }
 
-function pinfo2() {
+function __zconvey_pinfo2() {
     print -- "\033[1;33m$*\033[0m";
 }
 
@@ -85,7 +85,7 @@ function __zconvey_is_session_active() {
         local res idx="$1"
 
         if [[ "$idx" != <-> || "$idx" = "0" || "$idx" -gt "100" ]]; then
-            pinfo "Incorrect sesion ID occured: $idx"
+            __zconvey_pinfo "Incorrect sesion ID occured: $idx"
             return 2
         fi
 
@@ -467,6 +467,8 @@ __zconvey_preexec_hook() {
         # scheduling sequence will be quickly eradicated
         ZCONVEY_SCHEDULE_ORIGIN="$SECONDS"
         sched +"${ZCONVEY_CONFIG[check_interval]}" __zconvey_on_period_passed "$ZCONVEY_SCHEDULE_ORIGIN"
+
+        __zconvey_pinfo "Failure in reschedule detected ${zsh_scheduled_events[*]}"
     fi
 
     # Mark that the shell is busy
