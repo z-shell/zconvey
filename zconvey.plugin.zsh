@@ -59,7 +59,7 @@ function __zconvey_resolve_name_to_id() {
     for f in "$ZCONVEY_NAMES_DIR"/*.name(N); do
         arr=( ${(@f)"$(<$f)"} )
         arr=( "${(@M)arr:#:$name:}" )
-        if [ "${#arr}" != "0" ]; then
+        if [[ "${#arr}" != "0" ]]; then
             REPLY="${${f:t}%.name}"
         fi
     done
@@ -70,7 +70,7 @@ function __zconvey_get_name_of_id() {
 
     REPLY=""
     local f="$ZCONVEY_NAMES_DIR/${id}.name"
-    if [ -e "$f" ]; then
+    if [[ -e "$f" ]]; then
         REPLY=${(f)"$(<$f)"}
         REPLY="${REPLY#:}"
         REPLY="${REPLY%:}"
@@ -99,7 +99,7 @@ function __zconvey_is_session_active() {
 
         if [[ -e "$idfile" ]]; then
             # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
-            if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+            if [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]]; then
                 zsystem 2>/dev/null flock -t 0 -f tmpfd "$idfile"
                 res="$?"
             else
@@ -128,7 +128,7 @@ function __zconvey_is_session_active() {
 
 function zc-id() {
     __zconvey_get_name_of_id "$ZCONVEY_ID"
-    if [ -z "$REPLY" ]; then
+    if [[ -z "$REPLY" ]]; then
         print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m (no name assigned)";
     else
         print "This Zshell's ID: \033[1;33m<${ZCONVEY_ID}>\033[0m, name: \033[1;33m${REPLY}\033[0m";
@@ -150,7 +150,7 @@ function zc-id() {
 
     local use_zsystem_flock
     zstyle -b ":plugin:zconvey" use_zsystem_flock use_zsystem_flock || use_zsystem_flock="yes"
-    [ "$use_zsystem_flock" = "yes" ] && use_zsystem_flock="1" || use_zsystem_flock="0"
+    [[ "$use_zsystem_flock" = "yes" ]] && use_zsystem_flock="1" || use_zsystem_flock="0"
     ZCONVEY_CONFIG[use_zsystem_flock]="$use_zsystem_flock"
 
     local greeting
@@ -213,7 +213,7 @@ fi
 # Acquire ID
 #
 
-if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+if [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]]; then
     autoload is-at-least
     if ! is-at-least 5.3; then
         # Use, but not for acquire
@@ -263,7 +263,7 @@ fi
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
         # -e: preserve file descriptor on exec
-        if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+        if [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]]; then
             zsystem 2>/dev/null flock -t 0 -f ZCONVEY_FD -e "$lockfile"
             res="$?"
         else
@@ -273,7 +273,7 @@ fi
         fi
 
         if [[ "$res" = "101" || "$res" = "1" || "$res" = "2" ]]; then
-            [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" != "1" ] && exec {ZCONVEY_FD}>&-
+            [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" != "1" ]] && exec {ZCONVEY_FD}>&-
 
             # Is this the special case, i.e. inherition of ZCONVEY_ID?
             # In this case being unable to lock means: we already have
@@ -311,8 +311,8 @@ fi
     [[ "$ZCONVEY_FD" -ne "0" ]] && { echo "$$" >&${ZCONVEY_FD} } 2>/dev/null
 
     # Show what is resolved (ID and possibly a NAME)
-    [ "$ZCONVEY_CONFIG[greeting]" = "logo" ] && zc-logo echo
-    [ "$ZCONVEY_CONFIG[greeting]" = "text" ] && zc-id
+    [[ "$ZCONVEY_CONFIG[greeting]" = "logo" ]] && zc-logo echo
+    [[ "$ZCONVEY_CONFIG[greeting]" = "text" ]] && zc-id
 }
 
 #
@@ -353,13 +353,13 @@ function __zconvey_on_period_passed() {
     local lockfile="${datafile}.lock"
 
     # Quick return when no data
-    [ ! -e "$datafile" ] && return 0
+    [[ ! -e "$datafile" ]] && return 0
 
     # Prepare the lock file, follows locking it
     echo "PID $$ ID $ZCONVEY_ID is reading commands" > "$lockfile"
 
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
-    if [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]; then
+    if [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]]; then
         if ! zsystem flock -t 0 -f fd "$lockfile"; then
             LANG=C sleep 0.11
             if ! zsystem flock -t 0 -f fd "$lockfile"; then
@@ -374,7 +374,7 @@ function __zconvey_on_period_passed() {
             fi
         fi
     # 2. Zsh < 5.3 flock that isn't non-blocking
-    elif [ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "2" ]; then
+    elif [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "2" ]]; then
         if ! zsystem flock -t 1 -f fd "$lockfile"; then
             # Waited too long, lock must be broken, remove it
             command rm -f "$lockfile"
@@ -385,14 +385,14 @@ function __zconvey_on_period_passed() {
     else
         exec {fd}>"$lockfile"
         "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
-        if [ "$?" = "101" ]; then
+        if [[ "$?" = "101" ]]; then
             LANG=C sleep 0.11
             "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
-            if [ "$?" = "101" ]; then
+            if [[ "$?" = "101" ]]; then
                 # Examine the situation by waiting long
                 sleep 1
                 "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
-                if [ "$?" = "101" ]; then
+                if [[ "$?" = "101" ]]; then
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
@@ -409,9 +409,9 @@ function __zconvey_on_period_passed() {
 
     # Obtain current time stamp
     local ts
-    if [ "$ZCONVEY_CONFIG[timestamp_from]" = "datetime" ]; then
+    if [[ "$ZCONVEY_CONFIG[timestamp_from]" = "datetime" ]]; then
         [[ "${+modules}" = 1 && "${modules[zsh/datetime]}" != "loaded" && "${modules[zsh/datetime]}" != "autoloaded" ]] && zmodload zsh/datetime
-        [ "${+modules}" = 0 ] && zmodload zsh/datetime
+        [[ "${+modules}" = 0 ]] && zmodload zsh/datetime
         ts="$EPOCHSECONDS"
     fi
     # Also a fallback
@@ -432,7 +432,7 @@ function __zconvey_on_period_passed() {
     # TODO: a message that command expired
     if (( ts - cmdts <= ZCONVEY_CONFIG[expire_seconds] )); then
         # Two available methods of outputting the command
-        if [ "${ZCONVEY_CONFIG[output_method]}" = "zsh" ]; then
+        if [[ "${ZCONVEY_CONFIG[output_method]}" = "zsh" ]]; then
             if zle; then
                 zle __zconvey_zle_paster "$concat_command"
             else
