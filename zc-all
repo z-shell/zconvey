@@ -3,8 +3,8 @@ integer idx is_locked counter=0
 local name busyfile busywith
 
 __zconvey_usage_zc-all() {
-    pinfo2 "Sends command to all unbusy sessions (also busy when -f passed)"
-    pinfo "Usage: zc-all [-h|--help] [-f|--force] [-a|--ask] [-q|--quiet] [-v|--verbose] COMMAND ARGUMENT ..."
+    __zconvey_pinfo2 "Sends command to all unbusy sessions (also busy when -f passed)"
+    __zconvey_pinfo "Usage: zc-all [-h|--help] [-f|--force] [-a|--ask] [-q|--quiet] [-v|--verbose] COMMAND ARGUMENT ..."
     print -- "-h/--help                - this message"
     print -- "-q/--quiet               - don't output status messages"
     print -- "-v/--verbose             - output more status messages"
@@ -51,14 +51,14 @@ if (( $ask )); then
         cmd="${cmd##[[:space:]]#}"
         cmd="${cmd%%[[:space:]]#}"
         if [ -z "$cmd" ]; then
-            pinfo "No command enterred, exiting"
+            __zconvey_pinfo "No command enterred, exiting"
             return 0
         fi
     fi
 fi
 
 if [ -z "$cmd" ]; then
-    pinfo "No command provided, aborting"
+    __zconvey_pinfo "No command provided, aborting"
     return 1
 fi
 
@@ -93,7 +93,7 @@ for (( idx = 1; idx <= 100; idx ++ )); do
     fi
 done
 
-(( quiet )) || pinfo "Sent command to $counter other sessions"
+(( quiet )) || __zconvey_pinfo "Sent command to $counter other sessions"
 
 return 0
 

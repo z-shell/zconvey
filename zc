@@ -1,8 +1,8 @@
 setopt localoptions extendedglob clobber
 
 function __zconvey_usage_zc() {
-    pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
-    pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask] [-r|--raw] COMMAND ARGUMENT ..."
+    __zconvey_pinfo2 "Sends specified commands to given (via ID or NAME) Zsh session"
+    __zconvey_pinfo "Usage: zc {-i ID}|{-n NAME} [-q|--quiet] [-v|--verbose] [-h|--help] [-a|--ask] [-r|--raw] COMMAND ARGUMENT ..."
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
     print -- "-n NAME / --name NAME    - NAME of Zsh session"
@@ -45,12 +45,12 @@ fi
 (( raw = ${+opthash[-r]} + ${+opthash[--raw]} ))
 
 if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
-    pinfo "Please supply only one of ID (-i) and NAME (-n)"
+    __zconvey_pinfo "Please supply only one of ID (-i) and NAME (-n)"
     return 1
 fi
 
 if [[ "$have_id" != "0" && "$id" != <-> ]]; then
-    pinfo "ID must be numeric, 1..100"
+    __zconvey_pinfo "ID must be numeric, 1..100"
     return 1
 fi
 
@@ -75,7 +75,7 @@ if [[ -z "$cmd" && "$ask" = "0" ]]; then
 fi
 
 if [[ "$have_id" = "0" && "$have_name" = "0" && "$ask" = "0" ]]; then
-    pinfo "Either supply target ID/NAME or request Zsh-Select (-a/--ask)"
+    __zconvey_pinfo "Either supply target ID/NAME or request Zsh-Select (-a/--ask)"
     return 1
 fi
 
@@ -101,7 +101,7 @@ if (( $ask )); then
         cmd="${cmd##[[:space:]]#}"
         cmd="${cmd%%[[:space:]]#}"
         if [ -z "$cmd" ]; then
-            pinfo "No command enterred, exiting"
+            __zconvey_pinfo "No command enterred, exiting"
             return 0
         fi
     fi
@@ -109,14 +109,14 @@ if (( $ask )); then
     # Supply session?
     if [[ "$have_id" = "0" && "$have_name" = "0" ]]; then
         if ! type zsh-select 2>/dev/null 1>&2; then
-            pinfo "Zsh-Select not installed, please install it before using -a/--ask, aborting"
-            pinfo "Example installation: zplugin load psprint/zsh-select"
+            __zconvey_pinfo "Zsh-Select not installed, please install it before using -a/--ask, aborting"
+            __zconvey_pinfo "Example installation: zplugin load psprint/zsh-select"
             return 1
         else
             export ZSHSELECT_START_IN_SEARCH_MODE=0
             id=`zc-ls | zsh-select`
             if [ -z "$id" ]; then
-                pinfo "No selection, exiting"
+                __zconvey_pinfo "No selection, exiting"
                 return 0
             else
                 id="${id//(#b)*ID: ([[:digit:]]#)[^[:digit:]]#*(#e)/$match[1]}"
@@ -126,12 +126,12 @@ if (( $ask )); then
 fi
 
 if [ -z "$cmd" ]; then
-    pinfo "No command provided, aborting"
+    __zconvey_pinfo "No command provided, aborting"
     return 1
 fi
 
 if [[ "$id" != <-> || "$id" = "0" || "$id" -gt "100" ]]; then
-    pinfo "Incorrect sesion ID occured: \`$idx'. ID should be in range 1..100"
+    __zconvey_pinfo "Incorrect sesion ID occured: \`$idx'. ID should be in range 1..100"
     return 1
 fi
 
@@ -155,7 +155,7 @@ echo "PID $$ ID $ZCONVEY_ID is sending command" > "$lockfile"
 if (( ${ZCONVEY_CONFIG[use_zsystem_flock]} > 0 )); then
     (( ${verbose} )) && print "Will use zsystem flock..."
     if ! zsystem flock -t 2 -f fd "$lockfile"; then
-        pinfo2 "Communication channel of session $id is busy, could not send"
+        __zconvey_pinfo2 "Communication channel of session $id is busy, could not send"
         return 1
     fi
     # 2. Provided flock binary (two calls)
@@ -168,7 +168,7 @@ else
         LANG=C sleep 1
         "${ZCONVEY_REPO_DIR}/myflock/flock" -nx "$fd"
         if [ "$?" = "101" ]; then
-            pinfo2 "Communication channel of session $id is busy, could not send"
+            __zconvey_pinfo2 "Communication channel of session $id is busy, could not send"
             return 1
         fi
     fi

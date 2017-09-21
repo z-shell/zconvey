@@ -3,7 +3,7 @@ integer idx is_locked counter=0
 local busyfile busywith
 
 if [[ "$1" = "-h" || "$1" = "--help" ]]; then
-    pinfo "Sends zc-logo or zc-id to all terminals (the latter when argument \"text\" is passed)"
+    __zconvey_pinfo "Sends zc-logo or zc-id to all terminals (the latter when argument \"text\" is passed)"
     return 0
 fi
 
@@ -28,7 +28,7 @@ for (( idx = 1; idx <= 100; idx ++ )); do
     fi
 done
 
-pinfo "Sent logo request to $counter sessions, including this one"
+__zconvey_pinfo "Sent logo request to $counter sessions, including this one"
 
 return 0
 

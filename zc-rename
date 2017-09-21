@@ -1,8 +1,8 @@
 setopt localoptions extendedglob clobber
 
 function __zconvey_usage_zc-rename() {
-    pinfo2 "Renames current Zsh session, or one given via ID or (old) NAME"
-    pinfo "Usage: zc-rename [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
+    __zconvey_pinfo2 "Renames current Zsh session, or one given via ID or (old) NAME"
+    __zconvey_pinfo "Usage: zc-rename [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
     print -- "-n NAME / --name NAME    - NAME of Zsh session"
@@ -33,12 +33,12 @@ have_name=$(( ${+opthash[-n]} + ${+opthash[--name]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 
 if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
-    pinfo "Please supply only one of ID (-i) and NAME (-n)"
+    __zconvey_pinfo "Please supply only one of ID (-i) and NAME (-n)"
     return 1
 fi
 
 if [[ "$have_id" != "0" && ( "$id" != <-> || "$id" = "0" ) ]]; then
-    pinfo "ID must be numeric, 1..100"
+    __zconvey_pinfo "ID must be numeric, 1..100"
     return 1
 fi
 
@@ -47,7 +47,7 @@ if (( $have_name )); then
     __zconvey_resolve_name_to_id "$name"
     local resolved="$REPLY"
     if [ -z "$resolved" ]; then
-        pinfo "Could not find session named: \`$name'"
+        __zconvey_pinfo "Could not find session named: \`$name'"
         return 1
     fi
 
@@ -60,24 +60,24 @@ fi
 
 __zconvey_resolve_name_to_id "$new_name"
 if [ -n "$REPLY" ]; then
-    pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
+    __zconvey_pinfo "A session already has target name: \`$new_name' (its ID: $REPLY)"
     return 1
 fi
 
 if [[ "$id" != <-> || "$id" = "0" ]]; then
-    pinfo "Bad ID ($id), aborting"
+    __zconvey_pinfo "Bad ID ($id), aborting"
     return 1
 fi
 
 if [[ "$id" -gt "100" ]]; then
-    pinfo "Maximum nr of sessions is 100, aborting"
+    __zconvey_pinfo "Maximum nr of sessions is 100, aborting"
     return 1
 fi
 
 print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
 
 if (( ${quiet} == 0 )); then
-    pinfo2 "Renamed session $id to: $new_name"
+    __zconvey_pinfo2 "Renamed session $id to: $new_name"
 fi
 
 local ls_after_rename

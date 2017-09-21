@@ -1,9 +1,9 @@
 setopt localoptions extendedglob clobber
 
 function __zconvey_usage_zc-take() {
-    pinfo2 "Takes a name for current Zsh session, i.e. takes it away from any other session if needed"
-    pinfo2 "You can take a name for other session (not the current one) if -i or -n is provided"
-    pinfo "Usage: zc-take [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
+    __zconvey_pinfo2 "Takes a name for current Zsh session, i.e. takes it away from any other session if needed"
+    __zconvey_pinfo2 "You can take a name for other session (not the current one) if -i or -n is provided"
+    __zconvey_pinfo "Usage: zc-take [-i ID|-n NAME] [-q|--quiet] [-h|--help] NEW_NAME"
     print -- "-h/--help                - this message"
     print -- "-i ID / --id ID          - ID (number) of Zsh session"
     print -- "-n NAME / --name NAME    - NAME of Zsh session"
@@ -34,12 +34,12 @@ have_name=$(( ${+opthash[-n]} + ${+opthash[--name]} ))
 (( quiet = ${+opthash[-q]} + ${+opthash[--quiet]} ))
 
 if [[ "$have_id" != "0" && "$have_name" != "0" ]]; then
-    pinfo "Please supply only one of ID (-i) and NAME (-n)"
+    __zconvey_pinfo "Please supply only one of ID (-i) and NAME (-n)"
     return 1
 fi
 
 if [[ "$have_id" != "0" && ( "$id" != <-> || "$id" = "0" ) ]]; then
-    pinfo "ID must be numeric, 1..100"
+    __zconvey_pinfo "ID must be numeric, 1..100"
     return 1
 fi
 
@@ -60,12 +60,12 @@ elif (( $have_id == 0 )); then
 fi
 
 if [[ "$id" != <-> || "$id" = "0" ]]; then
-    pinfo "Bad ID ($id), aborting"
+    __zconvey_pinfo "Bad ID ($id), aborting"
     return 1
 fi
 
 if [[ "$id" -gt "100" ]]; then
-    pinfo "Maximum nr of sessions is 100, aborting"
+    __zconvey_pinfo "Maximum nr of sessions is 100, aborting"
     return 1
 fi
 
@@ -87,7 +87,7 @@ if [ -n "$other_id" ]; then
             # it to the initial conflicting session $new_name
             print ":$subst_name:" > "$ZCONVEY_NAMES_DIR"/"$other_id".name
 
-            (( ${quiet} == 0 )) && pinfo "Pre-rename: $new_name -> $subst_name"
+            (( ${quiet} == 0 )) && __zconvey_pinfo "Pre-rename: $new_name -> $subst_name"
 
             break
         fi
@@ -97,7 +97,7 @@ fi
 print ":$new_name:" > "$ZCONVEY_NAMES_DIR"/"$id".name
 
 if (( ${quiet} == 0 )); then
-    pinfo2 "Renamed session $id to: $new_name"
+    __zconvey_pinfo2 "Renamed session $id to: $new_name"
 fi
 
 local ls_after_rename
