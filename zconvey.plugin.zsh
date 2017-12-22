@@ -333,6 +333,7 @@ zle -N __zconvey_zle_paster
 #
 
 function __zconvey_on_period_passed() {
+    integer __ret=$?
     # Reschedule as quickly as possible - user might
     # press Ctrl-C when function is executing
     #
@@ -353,7 +354,7 @@ function __zconvey_on_period_passed() {
     local lockfile="${datafile}.lock"
 
     # Quick return when no data
-    [[ ! -e "$datafile" ]] && return 0
+    [[ ! -e "$datafile" ]] && return $__ret
 
     # Prepare the lock file, follows locking it
     echo "PID $$ ID $ZCONVEY_ID is reading commands" > "$lockfile"
@@ -369,7 +370,7 @@ function __zconvey_on_period_passed() {
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
-                    return 2
+                    return $__ret
                 fi
             fi
         fi
@@ -379,7 +380,7 @@ function __zconvey_on_period_passed() {
             # Waited too long, lock must be broken, remove it
             command rm -f "$lockfile"
             # Will handle this input at next call
-            return 3
+            return $__ret
         fi
     # 3. Provided flock binary
     else
@@ -396,7 +397,7 @@ function __zconvey_on_period_passed() {
                     # Waited too long, lock must be broken, remove it
                     command rm -f "$lockfile"
                     # Will handle this input at next call
-                    return 4
+                    return $__ret
                 fi
             fi
         fi
@@ -446,7 +447,7 @@ function __zconvey_on_period_passed() {
     # Tried: zle .kill-word, .backward-kill-line, .backward-kill-word,
     # .kill-line, .vi-kill-line, .kill-buffer, .kill-whole-line
 
-    return 0
+    return $__ret
 }
 
 #
