@@ -488,7 +488,7 @@ __zconvey_precmd_hook() {
 # Not called ideally at say SIGTERM, but
 # at least when "exit" is enterred
 function __zconvey_zshexit() {
-    [[ "$ZCONVEY_FD" != "0" && "$SHLVL" = "1" ]] && exec {ZCONVEY_FD}>&-
+    [[ "$ZCONVEY_FD" != "0" && "$SHLVL" = "1" ]] && { exec {ZCONVEY_FD}>&- ; } 2>/dev/null
 }
 
 if ! type sched 2>/dev/null 1>&2; then
