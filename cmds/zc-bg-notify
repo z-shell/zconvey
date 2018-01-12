@@ -233,7 +233,7 @@ fi
 # {{{
 
 local -a args
-args=( "${(q)@}" )
+args=( "$@" )
 
 local ntext="${args[*]}"
 
