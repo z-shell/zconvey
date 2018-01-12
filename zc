@@ -149,7 +149,7 @@ fi
 
 local fd datafile="${ZCONVEY_IO_DIR}/${id}.io"
 local lockfile="${datafile}.lock"
-echo "PID $$ ID $ZCONVEY_ID is sending command" > "$lockfile"
+{ echo "PID $$ ID $ZCONVEY_ID is sending command" >! "$lockfile"; } 2>/dev/null
 
 # 1. Zsh lock with timeout (2 seconds)
 if (( ${ZCONVEY_CONFIG[use_zsystem_flock]} > 0 )); then
@@ -175,7 +175,7 @@ else
 fi
 
 # >> - multiple commands can be accumulated
-print -r -- "$ts $cmd" >> "$datafile"
+print -r -- "$ts $cmd" >>! "$datafile"
 
 # Release the lock by closing the lock file
 exec {fd}>&-
