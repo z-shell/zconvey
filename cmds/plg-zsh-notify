@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+
+# For use with marzocchi/zsh-notify, by setting following zstyle in zshrc:
+# zstyle ':notify:*' notifier /path/to/zconvey/cmds/plg-zsh-notify
+
+typeset -g BINDIR=${0:h}
+
+local tpe="$1"
+read -t1 -r msg
+
+$BINDIR/zc-bg-notify -q "$tpe - $msg"
