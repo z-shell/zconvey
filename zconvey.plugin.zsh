@@ -43,11 +43,11 @@ command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$Z
 #
 
 function __zconvey_pinfo() {
-    print -- "\033[1;32m$*\033[0m";
+    print -- "\033[0;32m$*\033[0m";
 }
 
 function __zconvey_pinfo2() {
-    print -- "\033[1;33m$*\033[0m";
+    print -- "\033[0;33m$*\033[0m";
 }
 
 function __zconvey_resolve_name_to_id() {
