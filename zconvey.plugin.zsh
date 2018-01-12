@@ -30,10 +30,10 @@ autoload zc zc-rename zc-take zc-ls zc-logo zc-logo-all zc-all
 
 typeset -gi ZCONVEY_ID
 typeset -ghH ZCONVEY_FD
-typeset -ghH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
-typeset -ghH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-typeset -ghH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
-typeset -ghH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
+typeset -ghxH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
+typeset -ghxH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+typeset -ghxH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -ghxH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
 typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
 typeset -ghH ZCONVEY_SCHEDULE_ORIGIN
 command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$ZCONVEY_OTHER_DIR"
@@ -428,19 +428,29 @@ function __zconvey_on_period_passed() {
         concat_command+="; ${line#* }"
     done
     concat_command="${concat_command#; }"
-    [[ -o interactive_comments ]] && concat_command+=" ##"
+
+    integer notify=0
+    if [[ "$cmdts" = n* ]]; then
+        notify=1
+        cmdts="${cmdts#n}"
+    fi
 
     # TODO: a message that command expired
     if (( ts - cmdts <= ZCONVEY_CONFIG[expire_seconds] )); then
-        # Two available methods of outputting the command
-        if [[ "${ZCONVEY_CONFIG[output_method]}" = "zsh" ]]; then
-            if zle; then
-                zle __zconvey_zle_paster "$concat_command"
-            else
-                print -zr "$concat_command"
-            fi
+        if (( notify )); then
+            zle && { zle -M "Notification: $concat_command"; }
         else
-            "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
+            [[ -o interactive_comments ]] && concat_command+=" ##"
+            # Two available methods of outputting the command
+            if [[ "${ZCONVEY_CONFIG[output_method]}" = "zsh" ]]; then
+                if zle; then
+                    zle __zconvey_zle_paster "$concat_command"
+                else
+                    print -zr "$concat_command"
+                fi
+            else
+                "${ZCONVEY_REPO_DIR}/feeder/feeder" "$concat_command"
+            fi
         fi
     fi
 
