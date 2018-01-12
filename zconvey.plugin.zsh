@@ -6,8 +6,8 @@
 #
 
 0="${(%):-%N}" # this gives immunity to functionargzero being unset
-ZCONVEY_REPO_DIR="${0%/*}"
-ZCONVEY_CONFIG_DIR="$HOME/.config/zconvey"
+typeset -gx ZCONVEY_REPO_DIR="${0%/*}"
+typeset -gx ZCONVEY_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zconvey"
 
 #
 # Update FPATH if:
