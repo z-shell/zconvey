@@ -23,9 +23,9 @@ and can send commands to each other. Use this to switch all your Zshells to give
 notification under prompt of every active Zsh session. You can call this script from any program,
 Bash or GUI.
 
-Video – view on [asciinema](https://asciinema.org/a/85646). You can resize the video by pressing `Ctrl-+` or `Cmd-+`.
+Video – view on [asciinema](https://asciinema.org/a/156726). You can resize the video by pressing `Ctrl-+` or `Cmd-+`.
 
-[![asciicast](https://asciinema.org/a/85646.png)](https://asciinema.org/a/85646)
+[![asciicast](https://asciinema.org/a/156726.png)](https://asciinema.org/a/156726)
 
 # Zstyles
 
