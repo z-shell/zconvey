@@ -65,14 +65,13 @@ Install it with e.g. Zplugin to be able to use `-a` option for `zc` command. It 
 with [marzocchi/zsh-notify](https://github.com/marzocchi/zsh-notify), via `cmds/plg-zsh-notify`
 script.
 
-## [Zplugin](https://github.com/psprint/zplugin)
+## [Zplugin](https://github.com/zdharma/zplugin)
 
-Add `zplugin load psprint/zconvey` to your `.zshrc` file. Zplugin will handle
-cloning the plugin for you automatically the next time you start zsh. To update
-issue `zplugin update psprint/zconvey` (`update-all` can also be used).
+Add `zplugin load zdharma/zconvey` to your `.zshrc` file. Zplugin will clone the plugin
+ the next time you start zsh. To update issue `zplugin update zdharma/zconvey`.
 
 Zplugin can load in [turbo-mode](https://github.com/zdharma/zplugin#turbo-mode-zsh--53),
-below is an example configuration, together with adding `zc-bg-notify` to `$PATH`
+below is an example configuration, together with adding `zc-bg-notify` to `$PATH`:
 
 ```zsh
 zplugin ice wait"0"
@@ -83,18 +82,18 @@ zplugin light zdharma/zconvey
 
 ## Antigen
 
-Add `antigen bundle psprint/zconvey` to your `.zshrc` file. Antigen will handle
+Add `antigen bundle zdharma/zconvey` to your `.zshrc` file. Antigen will handle
 cloning the plugin for you automatically the next time you start zsh.
 
 ## Oh-My-Zsh
 
 1. `cd ~/.oh-my-zsh/custom/plugins`
-2. `git clone git@github.com:psprint/zconvey.git`
+2. `git clone git@github.com:zdharma/zconvey.git`
 3. Add `zconvey` to your plugin list
 
 ## Zgen
 
-Add `zgen load psprint/zconvey` to your .zshrc file in the same place you're doing
+Add `zgen load zdharma/zconvey` to your .zshrc file in the same place you're doing
 your other `zgen load` calls in.
 
 # Information
