@@ -29,13 +29,13 @@ autoload zc zc-rename zc-take zc-ls zc-logo zc-logo-all zc-all
 #
 
 typeset -gi ZCONVEY_ID
-typeset -ghH ZCONVEY_FD
-typeset -ghxH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
-typeset -ghxH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
-typeset -ghxH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
-typeset -ghxH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
-typeset -ghH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
-typeset -ghH ZCONVEY_SCHEDULE_ORIGIN
+typeset -gH ZCONVEY_FD
+typeset -gxH ZCONVEY_IO_DIR="${ZCONVEY_CONFIG_DIR}/io"
+typeset -gxH ZCONVEY_LOCKS_DIR="${ZCONVEY_CONFIG_DIR}/locks"
+typeset -gxH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
+typeset -gxH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
+typeset -gH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
+typeset -gH ZCONVEY_SCHEDULE_ORIGIN
 command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$ZCONVEY_OTHER_DIR"
 
 #
