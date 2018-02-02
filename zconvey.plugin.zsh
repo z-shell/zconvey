@@ -36,6 +36,7 @@ typeset -gxH ZCONVEY_NAMES_DIR="${ZCONVEY_CONFIG_DIR}/names"
 typeset -gxH ZCONVEY_OTHER_DIR="${ZCONVEY_CONFIG_DIR}/other"
 typeset -gH ZCONVEY_RUN_SECONDS=$(( SECONDS + 4 ))
 typeset -gH ZCONVEY_SCHEDULE_ORIGIN
+typeset -gHa ZCONVEY_NNS
 command mkdir -p "$ZCONVEY_IO_DIR" "$ZCONVEY_LOCKS_DIR" "$ZCONVEY_NAMES_DIR" "$ZCONVEY_OTHER_DIR"
 
 #
@@ -438,7 +439,8 @@ function __zconvey_on_period_passed() {
     # TODO: a message that command expired
     if (( ts - cmdts <= ZCONVEY_CONFIG[expire_seconds] )); then
         if (( notify )); then
-            zle && { zle -M "Notification: $concat_command"; }
+            ZCONVEY_NNS[1,0]="Notification: $concat_command"
+            zle && { zle -M "${(pj:\n:)ZCONVEY_NNS}"; }
         else
             [[ -o interactive_comments ]] && concat_command+=" ##"
             # Two available methods of outputting the command
@@ -489,6 +491,7 @@ __zconvey_preexec_hook() {
 # A hook marking the shell as not busy
 __zconvey_precmd_hook() {
     command rm -f "$ZCONVEY_OTHER_DIR/${ZCONVEY_ID}.busy"
+    ZCONVEY_NNS=()
 }
 
 #
