@@ -260,7 +260,7 @@ fi
         [[ "$try_id" = "0" ]] && continue
 
         lockfile="${ZCONVEY_LOCKS_DIR}/zsh_nr${try_id}"
-        [[ ! -f "$lockfile" ]] && echo "(created)" > "$lockfile"
+        [[ ! -f "$lockfile" ]] && echo "(created)" >! "$lockfile"
 
         # Use zsystem only if non-blocking call is available (Zsh >= 5.3)
         # -e: preserve file descriptor on exec
@@ -358,7 +358,7 @@ function __zconvey_on_period_passed() {
     [[ ! -e "$datafile" ]] && return $__ret
 
     # Prepare the lock file, follows locking it
-    echo "PID $$ ID $ZCONVEY_ID is reading commands" > "$lockfile"
+    echo "PID $$ ID $ZCONVEY_ID is reading commands" >! "$lockfile"
 
     # 1. Zsh 5.3 flock that supports timeout 0 (i.e. can be non-blocking)
     if [[ "${ZCONVEY_CONFIG[use_zsystem_flock]}" = "1" ]]; then
