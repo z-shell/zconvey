@@ -297,7 +297,7 @@ fi
                 # We will not be able to quick-close FD on zshexit
                 ZCONVEY_FD=0
             else
-                ZCONVEY_ID=try_id
+                ZCONVEY_ID=$try_id
                 # ID and FD will be inherited by subshells and exec zsh calls
                 export ZCONVEY_ID
                 export ZCONVEY_FD
