@@ -150,7 +150,7 @@ function zc-id() {
     ZCONVEY_CONFIG[check_interval]="$check_interval"
 
     local use_zsystem_flock
-    zstyle -b ":plugin:zconvey" use_zsystem_flock use_zsystem_flock || use_zsystem_flock="yes"
+    zstyle -T ":plugin:zuid" use_zsystem_flock && use_zsystem_flock="yes"
     [[ "$use_zsystem_flock" = "yes" ]] && use_zsystem_flock="1" || use_zsystem_flock="0"
     ZCONVEY_CONFIG[use_zsystem_flock]="$use_zsystem_flock"
 
