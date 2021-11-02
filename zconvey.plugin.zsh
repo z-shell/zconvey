@@ -187,7 +187,7 @@ if [[ ! -e "${ZCONVEY_REPO_DIR}/myflock/flock" ]]; then
     (
         if zmodload zsh/system 2>/dev/null; then
             if zsystem flock -t 1 "${ZCONVEY_REPO_DIR}/myflock/LICENSE"; then
-                echo "\033[1;35m""zdharma\033[0m/\033[1;33m""zconvey\033[0m is building small locking command for you..."
+                echo "\033[1;35m""z-shell\033[0m/\033[1;33m""zconvey\033[0m is building small locking command for you..."
                 make -C "${ZCONVEY_REPO_DIR}/myflock"
             fi
         else
@@ -201,7 +201,7 @@ if [[ ! -e "${ZCONVEY_REPO_DIR}/feeder/feeder" ]]; then
     (
         if zmodload zsh/system 2>/dev/null; then
             if zsystem flock -t 1 "${ZCONVEY_REPO_DIR}/myflock/LICENSE"; then
-                echo "\033[1;35m""zdharma\033[0m/\033[1;33m""zconvey\033[0m is building small command line feeder for you..."
+                echo "\033[1;35m""z-shell\033[0m/\033[1;33m""zconvey\033[0m is building small command line feeder for you..."
                 make -C "${ZCONVEY_REPO_DIR}/feeder"
             fi
         else
