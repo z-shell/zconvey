@@ -1,4 +1,4 @@
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=D6XDCHDSBDSDG)
+# `ZCONVEY`
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -65,35 +65,35 @@ Install it with e.g. Zplugin to be able to use `-a` option for `zc` command. It 
 with [marzocchi/zsh-notify](https://github.com/marzocchi/zsh-notify), via `cmds/plg-zsh-notify`
 script.
 
-## [Zplugin](https://github.com/zdharma/zplugin)
+## [Zinit](https://github.com/z-shell/zinit)
 
-Add `zplugin load zdharma/zconvey` to your `.zshrc` file. Zplugin will clone the plugin
- the next time you start zsh. To update issue `zplugin update zdharma/zconvey`.
+Add `zinit load z-shell/zconvey` to your `.zshrc` file. Zplugin will clone the plugin
+ the next time you start zsh. To update issue `zplugin update z-shell/zconvey`.
 
-Zplugin can load in [turbo-mode](https://github.com/zdharma/zplugin#turbo-mode-zsh--53),
+Zinit can load in [turbo-mode](https://github.com/z-shell/zinit#turbo-and-lucid),
 below is an example configuration, together with adding `zc-bg-notify` to `$PATH`:
 
 ```zsh
-zplugin ice wait"0"
-zplugin light zdharma/zconvey
-zplugin ice wait"0" as"command" pick"cmds/zc-bg-notify" silent
-zplugin light zdharma/zconvey
+zinit ice wait"0"
+zinit light z-shell/zconvey
+zinit ice wait"0" as"command" pick"cmds/zc-bg-notify" silent
+zinit light z-shell/zconvey
 ```
 
 ## Antigen
 
-Add `antigen bundle zdharma/zconvey` to your `.zshrc` file. Antigen will handle
+Add `antigen bundle z-shell/zconvey` to your `.zshrc` file. Antigen will handle
 cloning the plugin for you automatically the next time you start zsh.
 
 ## Oh-My-Zsh
 
 1. `cd ~/.oh-my-zsh/custom/plugins`
-2. `git clone git@github.com:zdharma/zconvey.git`
+2. `git clone git@github.com:z-shell/zconvey.git`
 3. Add `zconvey` to your plugin list
 
 ## Zgen
 
-Add `zgen load zdharma/zconvey` to your .zshrc file in the same place you're doing
+Add `zgen load z-shell/zconvey` to your .zshrc file in the same place you're doing
 your other `zgen load` calls in.
 
 # Information
