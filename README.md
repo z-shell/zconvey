@@ -1,6 +1,11 @@
+# `ZCONVEY`
+
+[![CodeFactor](https://www.codefactor.io/repository/github/z-shell/zconvey/badge)](https://www.codefactor.io/repository/github/z-shell/zconvey)
+
+---
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Introduction](#introduction)
 - [Zstyles](#zstyles)
@@ -12,8 +17,6 @@
 - [Information](#information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# `ZCONVEY`
 
 ## Introduction
 
