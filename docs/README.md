@@ -1,24 +1,16 @@
-# `ZCONVEY`
-
-[![CodeFactor](https://www.codefactor.io/repository/github/z-shell/zconvey/badge)](https://www.codefactor.io/repository/github/z-shell/zconvey)
-
----
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<h1> Zconvey </h1>
 
 - [Introduction](#introduction)
 - [Zstyles](#zstyles)
 - [Installation](#installation)
-  - [Zplugin](#zplugin)
+  - [ZI](#zi)
+  - [Zinit](#zinit)
   - [Antigen](#antigen)
   - [Oh-My-Zsh](#oh-my-zsh)
   - [Zgen](#zgen)
 - [Information](#information)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Introduction
+# Introduction
 
 Zconvey integrates multiple Zsh sessions. They are given an ID, optionally a NAME (both unique),
 and can send commands to each other. Use this to switch all your Zshells to given directory, via
@@ -30,7 +22,7 @@ Video – view on [asciinema](https://asciinema.org/a/156726). You can resize t
 
 [![asciicast](https://asciinema.org/a/156726.png)](https://asciinema.org/a/156726)
 
-## Zstyles
+# Zstyles
 
 The values being set are the defaults. They must be set before loading the plugin.
 
@@ -48,7 +40,7 @@ zstyle ":plugin:zconvey" output_method "feeder"     # To put commands on command
 zstyle ":plugin:zconvey" timestamp_from "datetime"  # Use zsh/datetime module for obtaining timestamp. "date" – use date command (fork)
 ```
 
-## Installation
+# Installation
 
 **The plugin is "standalone"**, which means that only sourcing it is needed. So to
 install, unpack `zconvey` somewhere and add
@@ -59,47 +51,52 @@ source {where-zconvey-is}/zconvey.plugin.zsh
 
 to `zshrc`.
 
-If using a plugin manager, then `Zplugin` is recommended, but you can use any
+If using a plugin manager, then `ZI` is recommended, but you can use any
 other too, and also install with `Oh My Zsh` (by copying directory to
 `~/.oh-my-zsh/custom/plugins`).
 
 The plugin integrates with my other plugin [Zsh-Select](https://github.com/psprint/zsh-select).
-Install it with e.g. Zplugin to be able to use `-a` option for `zc` command. It also integrates
+Install it with e.g. ZI to be able to use `-a` option for `zc` command. It also integrates
 with [marzocchi/zsh-notify](https://github.com/marzocchi/zsh-notify), via `cmds/plg-zsh-notify`
 script.
 
-### [Zinit](https://github.com/z-shell/zinit)
+## [ZI](https://github.com/z-shell/zi)
 
-Add `zinit load z-shell/zconvey` to your `.zshrc` file. Zplugin will clone the plugin
- the next time you start zsh. To update issue `zplugin update z-shell/zconvey`.
+Add `zi load z-shell/zconvey` to your `.zshrc` file. ZI will clone the plugin
+the next time you start zsh. To update issue `zi update z-shell/zconvey`.
 
-Zinit can load in [turbo-mode](https://github.com/z-shell/zinit#turbo-and-lucid),
+ZI can load in [turbo-mode](https://github.com/z-shell/zi#turbo-and-lucid),
 below is an example configuration, together with adding `zc-bg-notify` to `$PATH`:
 
 ```zsh
-zinit ice wait"0"
-zinit light z-shell/zconvey
-zinit ice wait"0" as"command" pick"cmds/zc-bg-notify" silent
-zinit light z-shell/zconvey
+zi ice wait"0"
+zi light z-shell/zconvey
+zi ice wait"0" as"command" pick"cmds/zc-bg-notify" silent
+zi light z-shell/zconvey
 ```
 
-### Antigen
+## Zinit
+
+Add `zinit load z-shell/zconvey` to your `.zshrc` file. ZI will clone the plugin
+the next time you start zsh. To update issue `zinit update z-shell/zconvey`.
+
+## Antigen
 
 Add `antigen bundle z-shell/zconvey` to your `.zshrc` file. Antigen will handle
 cloning the plugin for you automatically the next time you start zsh.
 
-### Oh-My-Zsh
+## Oh-My-Zsh
 
 1. `cd ~/.oh-my-zsh/custom/plugins`
 2. `git clone git@github.com:z-shell/zconvey.git`
 3. Add `zconvey` to your plugin list
 
-### Zgen
+## Zgen
 
 Add `zgen load z-shell/zconvey` to your .zshrc file in the same place you're doing
 your other `zgen load` calls in.
 
-## Information
+# Information
 
 There are following commands:
 
@@ -110,11 +107,10 @@ There are following commands:
 - `zc-ls` – lists all active and named sessions
 - `zc-id` – shows ID and NAME of current session
 - `zc-logo` – the same as `zc-id`, but in a form of an on-screen logo; bound to Ctrl-O Ctrl-I
-- `zc-bg-notify` – in subdirectory `cmds`, link it to `/usr/local/bin`, etc. or load with e.g. Zplugin
+- `zc-bg-notify` – in subdirectory `cmds`, link it to `/usr/local/bin`, etc. or load with e.g. ZI
 
 The main command is `zc` (yet it is rather rarely used, I'm always sending to all sessions with `zc-all`).
 It is used to execute commands on other sessions. `zc-ls` is the main tool
 to obtain overall information on sessions. `zc-take` is a nice rename tool to quickly name a few
 sessions. Keyboard shortcut Ctrl-O Ctrl-I will show current session's ID and NAME in form of an
 on-screen logo.
-
