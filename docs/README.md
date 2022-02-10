@@ -61,17 +61,16 @@ If using a plugin manager, then `ZI` is recommended, but you can use any
 other too, and also install with `Oh My Zsh` (by copying directory to
 `~/.oh-my-zsh/custom/plugins`).
 
-The plugin integrates with my other plugin [Zsh-Select](https://github.com/psprint/zsh-select).
-Install it with e.g. ZI to be able to use `-a` option for `zc` command. It also integrates
-with [marzocchi/zsh-notify](https://github.com/marzocchi/zsh-notify), via `cmds/plg-zsh-notify`
-script.
+The plugin integrates with:
+- [z-shell/zsh-select](https://github.com/z-shell/zsh-select). Install it with e.g. ZI to be able to use `-a` option for `zc` command.
+- [marzocchi/zsh-notify](https://github.com/marzocchi/zsh-notify), via `cmds/plg-zsh-notify` script.
 
 ## [ZI](https://github.com/z-shell/zi)
 
 Add `zi load z-shell/zconvey` to your `.zshrc` file. ZI will clone the plugin
 the next time you start zsh. To update issue `zi update z-shell/zconvey`.
 
-ZI can load in [turbo-mode](https://github.com/z-shell/zi#turbo-and-lucid),
+ZI can load in [turbo mode](https://z-shell.pages.dev/docs/getting_started/overview#turbo-mode-zsh--53),
 below is an example configuration, together with adding `zc-bg-notify` to `$PATH`:
 
 ```zsh
