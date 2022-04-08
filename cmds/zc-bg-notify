@@ -192,7 +192,7 @@ zsystem supports flock || typeset -g no_zsystem=1
 typeset -g ZCONVEY_REPO_DIR ZCONVEY_CONFIG_DIR ZCONVEY_IO_DIR ZCONVEY_LOCKS_DIR ZCONVEY_NAMES_DIR ZCONVEY_OTHER_DIR
 typeset -gA ZCONVEY_CONFIG
 
-: ${ZCONVEY_REPO_DIR:=$HOME/.zplugin/plugins/zdharma---zconvey}    # TODO: add configuration file
+: ${ZCONVEY_REPO_DIR:=$HOME/.zi/plugins/z-shell---zconvey}    # TODO: #1 add configuration file
 : ${ZCONVEY_CONFIG_DIR:=${XDG_CONFIG_HOME:-$HOME/.config}/zconvey}
 : ${ZCONVEY_IO_DIR:=${ZCONVEY_CONFIG_DIR}/io}
 : ${ZCONVEY_LOCKS_DIR:=${ZCONVEY_CONFIG_DIR}/locks}

@@ -1,3 +1,4 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 #
 # No plugin manager is needed to use this file. All that is needed is adding:
 #   source {where-zconvey-is}/zconvey.plugin.zsh
@@ -19,9 +20,16 @@ if [[ -z "$ZPLG_CUR_PLUGIN" && "${fpath[(r)$ZCONVEY_REPO_DIR]}" != $ZCONVEY_REPO
     fpath+=( "$ZCONVEY_REPO_DIR" )
 fi
 
+# Functions Directory
+# https://z.digitalclouds.dev/community/zsh_plugin_standard#funtions-directory
+if [[ $PMSPEC != *f* ]] {
+    fpath+=( "${0:h}/functions" )
+}
+
 #
 # Autoloads
 #
+
 autoload zc zc-rename zc-take zc-ls zc-logo zc-logo-all zc-all
 
 #
@@ -436,7 +444,7 @@ function __zconvey_on_period_passed() {
         cmdts="${cmdts#n}"
     fi
 
-    # TODO: a message that command expired
+    # TODO: #2 a message that command expired
     if (( ts - cmdts <= ZCONVEY_CONFIG[expire_seconds] )); then
         if (( notify )); then
             ZCONVEY_NNS[1,0]="Notification: $concat_command"
@@ -521,4 +529,4 @@ add-zsh-hook precmd __zconvey_precmd_hook
 zle -N zc-logo
 bindkey '^O^I' zc-logo
 
-# vim:ft=zsh
+# vim: ft=zsh sw=2 ts=2 et

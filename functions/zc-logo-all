@@ -1,3 +1,5 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+
 setopt localoptions extendedglob clobber
 integer idx is_locked counter=0
 local busyfile busywith
@@ -7,14 +9,14 @@ if [[ "$1" = "-h" || "$1" = "--help" ]]; then
     return 0
 fi
 
-for (( idx = 1; idx <= 100; idx ++ )); do
+for ((idx = 1; idx <= 100; idx++)); do
     name=""
     busywith=""
     is_locked=0
 
     __zconvey_is_session_active "$idx" && is_locked=1 || is_locked=0
 
-    if (( is_locked )); then
+    if ((is_locked)); then
         busyfile="$ZCONVEY_OTHER_DIR/${idx}.busy"
         if [[ -e "$busyfile" && "$idx" != "$ZCONVEY_ID" ]]; then
             busywith="\033[1;33m$(<$busyfile)\033[0m"
@@ -32,4 +34,4 @@ __zconvey_pinfo "Sent logo request to $counter sessions, including this one"
 
 return 0
 
-# vim:ft=zsh
+# vim: ft=zsh sw=2 ts=2 et

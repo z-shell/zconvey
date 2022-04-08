@@ -1,3 +1,5 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+#
 setopt localoptions extendedglob clobber
 
 function __zconvey_usage_zc() {
@@ -110,7 +112,7 @@ if (( $ask )); then
     if [[ "$have_id" = "0" && "$have_name" = "0" ]]; then
         if ! type zsh-select 2>/dev/null 1>&2; then
             __zconvey_pinfo "Zsh-Select not installed, please install it before using -a/--ask, aborting"
-            __zconvey_pinfo "Example installation: zplugin load psprint/zsh-select"
+            __zconvey_pinfo "Example installation: zplugin load z-shell/zsh-select"
             return 1
         else
             export ZSHSELECT_START_IN_SEARCH_MODE=0
@@ -195,4 +197,4 @@ if (( ${quiet} == 0 )); then
     (( is_locked == 0 )) && print "The session is ABSENT, the command will probably time out (after ${ZCONVEY_CONFIG[expire_seconds]}s)"
 fi
 
-# vim:ft=zsh
+# vim: ft=zsh sw=2 ts=2 et

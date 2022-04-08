@@ -1,9 +1,11 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+
 setopt localoptions extendedglob clobber
 
 integer idx is_locked
 local name busyfile busywith
 
-for (( idx = 1; idx <= 100; idx ++ )); do
+for ((idx = 1; idx <= 100; idx++)); do
     name=""
     busywith=""
 
@@ -35,4 +37,4 @@ for (( idx = 1; idx <= 100; idx ++ )); do
     fi
 done
 
-# vim:ft=zsh
+# vim: ft=zsh sw=2 ts=2 et
