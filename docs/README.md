@@ -1,22 +1,13 @@
+<table><tr><td>
 <h2 align="center">
   <a href="https://github.com/z-shell/zi">
     <img src="https://github.com/z-shell/zi/raw/main/docs/images/logo.svg" alt="Logo" width="80" height="80" />
   </a>
 ❮ ZI ❯ Plugin - ZConvey
 </h2>
-
-
-- [Introduction](#introduction)
-- [Zstyles](#zstyles)
-- [Installation](#installation)
-  - [ZI](#zi)
-  - [Zinit](#zinit)
-  - [Antigen](#antigen)
-  - [Oh-My-Zsh](#oh-my-zsh)
-  - [Zgen](#zgen)
-- [Information](#information)
-
-# Introduction
+  <a href="https://asciinema.org/a/208206" target="_blank"><img src="https://asciinema.org/a/156726.svg" /></a>
+  <b>You can resize the video by pressing <kbd>Ctrl-+</kbd> or <kbd>Cmd-+</kbd></b>
+</td></tr></table>
 
 Zconvey integrates multiple Zsh sessions. They are given an ID, optionally a NAME (both unique),
 and can send commands to each other. Use this to switch all your Zshells to given directory, via
@@ -24,11 +15,7 @@ and can send commands to each other. Use this to switch all your Zshells to give
 notification under prompt of every active Zsh session. You can call this script from any program,
 Bash or GUI.
 
-Video – view on [asciinema](https://asciinema.org/a/156726). You can resize the video by pressing `Ctrl-+` or `Cmd-+`.
-
-[![asciicast](https://asciinema.org/a/156726.png)](https://asciinema.org/a/156726)
-
-# Zstyles
+## Zstyles
 
 The values being set are the defaults. They must be set before loading the plugin.
 
@@ -46,7 +33,7 @@ zstyle ":plugin:zconvey" output_method "feeder"     # To put commands on command
 zstyle ":plugin:zconvey" timestamp_from "datetime"  # Use zsh/datetime module for obtaining timestamp. "date" – use date command (fork)
 ```
 
-# Installation
+## Installation
 
 **The plugin is "standalone"**, which means that only sourcing it is needed. So to
 install, unpack `zconvey` somewhere and add
