@@ -49,6 +49,7 @@ other too, and also install with `Oh My Zsh` (by copying directory to
 `~/.oh-my-zsh/custom/plugins`).
 
 The plugin integrates with:
+
 - [z-shell/zsh-select](https://github.com/z-shell/zsh-select). Install it with e.g. ZI to be able to use `-a` option for `zc` command.
 - [marzocchi/zsh-notify](https://github.com/marzocchi/zsh-notify), via `cmds/plg-zsh-notify` script.
 
